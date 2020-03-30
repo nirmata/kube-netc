@@ -99,6 +99,10 @@ func (t *Tracker) StartTracker() {
 	check(err)
 }
 
+func (t *Tracker) GetNumConnections() uint16 {
+	return t.numConnections
+}
+
 func (t *Tracker) GetBytesRecvPerSecond() uint64 {
 	return t.bytesRecvPerSecond
 }
@@ -172,6 +176,8 @@ func (t *Tracker) run() error {
 
 			}
 
+			
+
 			// Adding the new bytes to the stats
 			var newSentBytes uint64
 			var newRecvBytes uint64
@@ -179,9 +185,11 @@ func (t *Tracker) run() error {
 			var newChangeRecvBytes uint64
 			var totalSent uint64
 			var totalRecv uint64
+			var numConnections uint16
 			
 			for _, v := range t.dataHistory {
 				if v.active {
+					numConnections++
 					newSentBytes += v.bytesSent
 					newRecvBytes += v.bytesRecv
 					newChangeSentBytes += (v.bytesSent - v.lastBytesSent)
@@ -191,6 +199,7 @@ func (t *Tracker) run() error {
 				totalRecv += v.bytesRecv
 			}
 
+			t.numConnections = numConnections
 			t.totalSent = totalSent
 			t.totalRecv = totalRecv
 			t.bytesSent = newSentBytes
