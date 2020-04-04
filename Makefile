@@ -7,7 +7,7 @@ promserv:
 	go build -o promserv $(BUILD_ARGS) examples/promserv.go
 
 tests:
-	go test $(BUILD_ARGS) ./pkg/tracker 
+	sudo go test $(BUILD_ARGS) ./pkg/tracker 
 
 clean:
 	rm examples/recv examples/promserv

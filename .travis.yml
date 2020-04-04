@@ -9,4 +9,7 @@ gobuild_args: -tags="linux_bpf"
 install: go get ./pkg/...
 
 script:
-- sudo make tests
+- make tests
+
+notifications:
+  email: false
