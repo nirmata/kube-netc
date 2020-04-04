@@ -38,7 +38,7 @@ type Tracker struct {
 	trackLastUpdated time.Time
 	
 	// string key will be in the form ip:port
-	dataHistory map[string]*trackData
+	dataHistory map[ConnectionID]*trackData
 }
 
 // Stats that are tracked for each connection
@@ -53,6 +53,19 @@ type trackData struct {
 	lastBytesRecv uint64
 	// Used to tell when connection is inactive
 	lastUpdated time.Time
+}
+
+type ExportData struct {
+	BytesSent uint64
+	BytesRecv uint64
+	LastUpdated time.Time
+}
+
+type ConnectionID struct {
+	DAddr string
+	DPort uint16
+	SAddr string
+	SPort uint16
 }
 
 var(
@@ -82,7 +95,7 @@ var(
 		bytesRecv: 0,
 		bytesSentPerSecond: 0.0,
 		bytesRecvPerSecond: 0.0,
-		dataHistory: make(map[string]*trackData),
+		dataHistory: make(map[ConnectionID]*trackData),
 		
 	}
 )
@@ -94,25 +107,8 @@ func NewTracker() *Tracker {
 func (t *Tracker) StartTracker() {
 	err := checkSupport()
 	check(err)
-	fmt.Println("Running tracker...")
 	err = t.run()
 	check(err)
-}
-
-func (t *Tracker) GetNumConnections() uint16 {
-	return t.numConnections
-}
-
-func (t *Tracker) GetBytesRecvPerSecond() uint64 {
-	return t.bytesRecvPerSecond
-}
-
-func (t *Tracker) GetBytesRecv() uint64 {
-	return t.bytesRecv
-}
-
-func (t *Tracker) GetTotalBytesRecv() uint64 {
-	return t.totalRecv
 }
 
 func checkSupport() error {
@@ -129,7 +125,6 @@ func checkSupport() error {
 }
 
 func (t *Tracker) run() error {
-	fmt.Println("Tracker Running")
 	tracer, err := ebpf.NewTracer(t.Config)
 	if err != nil{
 		return err
@@ -144,7 +139,7 @@ func (t *Tracker) run() error {
 		case <-ticker:
 
 			for k, v := range t.dataHistory {
-				if time.Since(v.lastUpdated) >= 5 * time.Second {
+				if time.Since(v.lastUpdated) >= 20 * time.Second {
 					t.dataHistory[k].active = false
 				}
 			}
@@ -156,39 +151,50 @@ func (t *Tracker) run() error {
 
 			conns := cs.Conns
 			for _, c := range conns{
-				id := fmtAddress(c.String(), c.DPort)
+				id := ConnectionID{
+					SAddr: c.Source.String(),
+					SPort: c.SPort,
+					DAddr: c.Dest.String(),
+					DPort: c.DPort,
+				}
+				// Creating a new entry for this connection if it doesn't exist
 				if _, ok := t.dataHistory[id]; !ok{
 					t.dataHistory[id] = &trackData{
 						bytesSent: c.MonotonicSentBytes,
 						bytesRecv: c.MonotonicRecvBytes,
+						lastBytesSent: c.MonotonicSentBytes,
+						lastBytesRecv: c.MonotonicRecvBytes,
 						active: true,
 						lastUpdated: time.Now(),
-					}	
-				} else {
-					t.dataHistory[id].lastBytesSent = t.dataHistory[id].bytesSent
-					t.dataHistory[id].lastBytesRecv = t.dataHistory[id].bytesRecv
-					t.dataHistory[id].bytesSent = c.MonotonicSentBytes
-					t.dataHistory[id].bytesRecv = c.MonotonicRecvBytes
-					t.dataHistory[id].active = true
-					t.dataHistory[id].lastUpdated = time.Now()
-					
+					}
 				}
-
+				// Updating the entry if it does exist
+				
+				t.dataHistory[id].lastBytesSent = t.dataHistory[id].bytesSent
+				t.dataHistory[id].lastBytesRecv = t.dataHistory[id].bytesRecv
+				t.dataHistory[id].bytesSent = c.MonotonicSentBytes
+				t.dataHistory[id].bytesRecv = c.MonotonicRecvBytes
+				t.dataHistory[id].lastUpdated = time.Now()
 			}
 
 			
 
 			// Adding the new bytes to the stats
-			var newSentBytes uint64
-			var newRecvBytes uint64
-			var newChangeSentBytes uint64
-			var newChangeRecvBytes uint64
-			var totalSent uint64
-			var totalRecv uint64
-			var numConnections uint16
+			var(
+				newSentBytes uint64 = 0
+				newRecvBytes uint64 = 0
+				newChangeSentBytes uint64 = 0
+				newChangeRecvBytes uint64 = 0
+				totalSent uint64 = 0
+				totalRecv uint64 = 0
+				numConnections uint16 = 0
+			)
 			
 			for _, v := range t.dataHistory {
 				if v.active {
+					if (v.bytesSent - v.lastBytesSent) < 0 {
+						fmt.Println("PROBLEM")
+					}
 					numConnections++
 					newSentBytes += v.bytesSent
 					newRecvBytes += v.bytesRecv
@@ -204,9 +210,9 @@ func (t *Tracker) run() error {
 			t.totalRecv = totalRecv
 			t.bytesSent = newSentBytes
 			t.bytesRecv = newRecvBytes
-			t.bytesSentPerSecond = uint64(float64(newChangeSentBytes)/float64(time.Since(t.trackLastUpdated)/time.Second))
-			t.bytesRecvPerSecond = uint64(float64(newChangeRecvBytes)/float64(time.Since(t.trackLastUpdated)/time.Second))
-
+			tStop := time.Since(t.trackLastUpdated)
+			t.bytesSentPerSecond = uint64(float64(newChangeSentBytes)/(float64(tStop)/float64(time.Second)))
+			t.bytesRecvPerSecond = uint64(float64(newChangeRecvBytes)/(float64(tStop)/float64(time.Second)))
 
 
 			t.trackLastUpdated = time.Now()
@@ -214,12 +220,9 @@ func (t *Tracker) run() error {
 		}
 	}
 }
-func fmtAddress(addr string, port uint16) string {
-	return addr + ":" + string(port)
-}
 
 // Clears the current internal tracking data.
 func (t *Tracker) ResetStats() error {
-	t.dataHistory = make(map[string]*trackData)
+	t.dataHistory = make(map[ConnectionID]*trackData)
 	return nil
 }

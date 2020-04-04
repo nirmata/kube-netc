@@ -3,7 +3,7 @@ package collector
 import(
 	"time"
 
-	"github.com/nirmata/kube-netsee/tracker"
+	"github.com/nirmata/kube-netsee/pkg/tracker"
 	"github.com/prometheus/client_golang/prometheus"
         "github.com/prometheus/client_golang/prometheus/promauto"
 )

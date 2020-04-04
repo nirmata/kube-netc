@@ -3,7 +3,7 @@ package main
 import(
 	"fmt"
 	"time"
-	"github.com/nirmata/kube-netsee/tracker"
+	"github.com/nirmata/kube-netsee/pkg/tracker"
 	"github.com/dustin/go-humanize"
 )
 
@@ -12,12 +12,13 @@ import(
 func main(){
 	t := tracker.NewTracker()
 	go t.StartTracker()
-	ticker := time.NewTicker(2 * time.Second).C
+	ticker := time.NewTicker(3 * time.Second).C
 	for{
 		select{
 		case <-ticker:
-			fmt.Printf("%s bytes recv\n", humanize.Bytes(t.GetTotalBytesRecv()))
+			fmt.Printf("%s bytes/s\n", humanize.Bytes(t.GetBytesRecvPerSecond()))
 			fmt.Printf("%d connections\n", t.GetNumConnections())
+			//fmt.Printf("%v\n", t.GetConnectionData())
 		}
 	}
 }

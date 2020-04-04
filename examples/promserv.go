@@ -5,8 +5,8 @@ import(
 	"time"
 	
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/nirmata/kube-netsee/collector"
-	"github.com/nirmata/kube-netsee/tracker"
+	"github.com/nirmata/kube-netsee/pkg/collector"
+	"github.com/nirmata/kube-netsee/pkg/tracker"
 )
 
 func main(){

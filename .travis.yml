@@ -1,0 +1,12 @@
+language: go
+
+go:
+- "1.13"
+- "1.14"
+
+gobuild_args: -tags="linux_bpf"
+
+install: go get ./pkg/...
+
+script:
+- sudo make tests
