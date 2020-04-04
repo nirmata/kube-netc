@@ -6,6 +6,8 @@ go:
 
 gobuild_args: -tags="linux_bpf"
 
+before_install: sudo cp /usr/local/bin/go /usr/bin
+
 install: go get ./pkg/...
 
 script:
