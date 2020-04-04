@@ -6,6 +6,8 @@ func (t *Tracker) GetConnectionData() map[ConnectionID]ExportData {
 		m[k] = ExportData{
 			BytesSent: v.bytesSent,
 			BytesRecv: v.bytesRecv,
+			BytesSentPerSecond: v.bytesSentPerSecond,
+			BytesRecvPerSecond: v.bytesRecvPerSecond,
 			LastUpdated: v.lastUpdated,
 		}
 	}

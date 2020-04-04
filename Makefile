@@ -6,8 +6,11 @@ recv:
 promserv:
 	go build -o promserv $(BUILD_ARGS) examples/promserv.go
 
+bps:
+	go build -o bps $(BUILD_ARGS) examples/bps.go
+
 tests:
-	sudo go test $(BUILD_ARGS) ./pkg/tracker 
+	sudo -E go test $(BUILD_ARGS) ./pkg/tracker 
 
 clean:
-	rm examples/recv examples/promserv
+	rm recv promserv bps

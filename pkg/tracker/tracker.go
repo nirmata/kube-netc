@@ -51,6 +51,10 @@ type trackData struct {
 	// Used in calculation of bytesPerSecond
 	lastBytesSent uint64
 	lastBytesRecv uint64
+
+	bytesSentPerSecond uint64
+	bytesRecvPerSecond uint64
+	
 	// Used to tell when connection is inactive
 	lastUpdated time.Time
 }
@@ -58,6 +62,8 @@ type trackData struct {
 type ExportData struct {
 	BytesSent uint64
 	BytesRecv uint64
+	BytesSentPerSecond uint64
+	BytesRecvPerSecond uint64
 	LastUpdated time.Time
 }
 
@@ -169,11 +175,19 @@ func (t *Tracker) run() error {
 					}
 				}
 				// Updating the entry if it does exist
+				lastbSent := t.dataHistory[id].bytesSent
+				lastbRecv := t.dataHistory[id].bytesRecv
+				currbSent := c.MonotonicSentBytes
+				currbRecv := c.MonotonicRecvBytes
 				
-				t.dataHistory[id].lastBytesSent = t.dataHistory[id].bytesSent
-				t.dataHistory[id].lastBytesRecv = t.dataHistory[id].bytesRecv
-				t.dataHistory[id].bytesSent = c.MonotonicSentBytes
-				t.dataHistory[id].bytesRecv = c.MonotonicRecvBytes
+				t.dataHistory[id].lastBytesSent = lastbSent
+				t.dataHistory[id].lastBytesRecv = lastbRecv
+				t.dataHistory[id].bytesSent = currbSent
+				t.dataHistory[id].bytesRecv = currbRecv
+
+				tConn := time.Since(t.dataHistory[id].lastUpdated)
+				t.dataHistory[id].bytesRecvPerSecond = uint64(float64(currbRecv - lastbRecv)/(float64(tConn)/float64(time.Second)))
+				t.dataHistory[id].bytesSentPerSecond = uint64(float64(currbSent - lastbSent)/(float64(tConn)/float64(time.Second)))
 				t.dataHistory[id].lastUpdated = time.Now()
 			}
 
@@ -192,9 +206,6 @@ func (t *Tracker) run() error {
 			
 			for _, v := range t.dataHistory {
 				if v.active {
-					if (v.bytesSent - v.lastBytesSent) < 0 {
-						fmt.Println("PROBLEM")
-					}
 					numConnections++
 					newSentBytes += v.bytesSent
 					newRecvBytes += v.bytesRecv
