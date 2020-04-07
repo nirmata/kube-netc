@@ -2,27 +2,28 @@ package collector
 
 import(
 	"time"
-
+	
 	"github.com/nirmata/kube-netsee/pkg/tracker"
 	"github.com/prometheus/client_golang/prometheus"
-        "github.com/prometheus/client_golang/prometheus/promauto"
 )
 
-
-var(
-	activeConnections = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "active_connections",
-		Help: "Number of connections to the node",
-	})
-)
-
-func StartCollector(tracker *tracker.Tracker, t time.Duration){
+func StartCollector(tr *tracker.Tracker, t time.Duration){
 	go func(tick time.Duration){
 		tc := time.NewTicker(t).C
 		for{
 			select{
 				case <-tc:
-				activeConnections.Set(float64(tracker.GetNumConnections()))
+				
+				ActiveConnections.Set(float64(tr.GetNumConnections()))
+				
+				conns := tr.GetConnectionData()
+				for k, v := range conns {
+					dest := prometheus.Labels{"dest": tracker.FormatCID(k)}
+					BytesSent.With(dest).Set(float64(v.BytesSent))
+					BytesRecv.With(dest).Set(float64(v.BytesRecv))
+					BytesSentPerSecond.With(dest).Set(float64(v.BytesSentPerSecond))
+					BytesRecvPerSecond.With(dest).Set(float64(v.BytesRecvPerSecond))
+				}
 			}
 		}
 	}(t)

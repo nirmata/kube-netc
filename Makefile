@@ -10,7 +10,7 @@ bps:
 	go build -o bps $(BUILD_ARGS) examples/bps.go
 
 tests:
-	sudo -E env "PATH=$(PATH)" go test $(BUILD_ARGS) ./pkg/tracker 
+	go test $(BUILD_ARGS) ./pkg/tracker 
 
 clean:
 	rm recv promserv bps

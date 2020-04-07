@@ -2,14 +2,13 @@ language: go
 
 go:
 - "1.13"
-- "1.14"
 
 gobuild_args: -tags="linux_bpf"
 
 install: go get ./pkg/...
 
 script:
-- make tests
+- sudo -E env PATH=$PATH make tests
 
 notifications:
   email: false
