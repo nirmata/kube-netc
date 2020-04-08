@@ -5,5 +5,5 @@ import(
 )
 
 func FormatCID(cid ConnectionID) string {
-	return cid.DAddr + ":" + strconv.Itoa(int(cid.DPort))
+	return cid.SAddr + ":" + strconv.Itoa(int(cid.SPort)) + "-" + cid.DAddr + ":" + strconv.Itoa(int(cid.DPort))
 }

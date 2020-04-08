@@ -8,23 +8,20 @@ import(
 )
 
 func StartCollector(tr *tracker.Tracker, t time.Duration){
-	go func(tick time.Duration){
-		tc := time.NewTicker(t).C
-		for{
-			select{
-				case <-tc:
-				
-				ActiveConnections.Set(float64(tr.GetNumConnections()))
-				
-				conns := tr.GetConnectionData()
-				for k, v := range conns {
-					dest := prometheus.Labels{"dest": tracker.FormatCID(k)}
-					BytesSent.With(dest).Set(float64(v.BytesSent))
-					BytesRecv.With(dest).Set(float64(v.BytesRecv))
-					BytesSentPerSecond.With(dest).Set(float64(v.BytesSentPerSecond))
-					BytesRecvPerSecond.With(dest).Set(float64(v.BytesRecvPerSecond))
-				}
-			}
+	for{
+		select{
+			case update:=<-tr.NodeUpdateChan:
+
+			ActiveConnections.Set(float64(update.NumConnections))
+
+			case update:=<-tr.ConnUpdateChan:
+
+			id := prometheus.Labels{"id": tracker.FormatCID(update.Connection)}
+			BytesSent.With(id).Set(float64(update.Data.BytesSent))
+			BytesRecv.With(id).Set(float64(update.Data.BytesRecv))
+			BytesSentPerSecond.With(id).Set(float64(update.Data.BytesSentPerSecond))
+			BytesRecvPerSecond.With(id).Set(float64(update.Data.BytesRecvPerSecond))
+			
 		}
-	}(t)
+	}
 }

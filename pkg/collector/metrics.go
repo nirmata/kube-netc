@@ -14,7 +14,7 @@ var (
 			Name: "bytes_sent",
 			Help: "Total bytes sent to a given connection",
 		},
-		[]string{"dest"},
+		[]string{"id"},
 	)
 	
 	BytesRecv = prometheus.NewGaugeVec(
@@ -22,7 +22,7 @@ var (
 			Name: "bytes_recv",
 			Help: "Total bytes received from a given connection",
 		},
-		[]string{"dest"},
+		[]string{"id"},
 	)
 
 	BytesSentPerSecond = prometheus.NewGaugeVec(
@@ -30,7 +30,7 @@ var (
 			Name: "bytes_sent_per_second",
 			Help: "Bytes per second being sent to a given connection",
 		},
-		[]string{"dest"},
+		[]string{"id"},
 	)
 
 	BytesRecvPerSecond = prometheus.NewGaugeVec(
@@ -38,7 +38,7 @@ var (
 			Name: "bytes_recv_per_second",
 			Help: "Bytes per second being received from a given connection",
 		},
-		[]string{"dest"},
+		[]string{"id"},
 	)
 
 	// Number of connections

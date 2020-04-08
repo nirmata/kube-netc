@@ -12,7 +12,7 @@ import(
 func main(){
 	t := tracker.NewTracker()
 	go t.StartTracker()
-	collector.StartCollector(t, 2 * time.Second)
+	go collector.StartCollector(t, 2 * time.Second)
 
 	http.Handle("/metrics", promhttp.Handler())
 	http.ListenAndServe(":2112", nil)
