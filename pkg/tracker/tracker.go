@@ -11,6 +11,12 @@ import(
 	"github.com/drewrip/datadog-agent/pkg/ebpf"
 )
 
+
+const(
+	MaxConnBuffer = 256
+)
+
+
 func check(err error){
 	if err != nil{
 		log.Fatalf("[%v] error: %s", time.Now(), err)
@@ -39,6 +45,10 @@ type Tracker struct {
 	
 	// string key will be in the form ip:port
 	dataHistory map[ConnectionID]*trackData
+
+
+	NodeUpdateChan chan NodeUpdate
+	ConnUpdateChan chan ConnUpdate
 }
 
 // Stats that are tracked for each connection
@@ -65,6 +75,22 @@ type ExportData struct {
 	BytesSentPerSecond uint64
 	BytesRecvPerSecond uint64
 	LastUpdated time.Time
+}
+
+type NodeUpdate struct {
+	BytesSent uint64
+	BytesRecv uint64
+	BytesSentPerSecond uint64
+	BytesRecvPerSecond uint64
+	LastUpdated time.Time
+
+	NumConnections uint16
+}
+
+// Type to be piped through chan to collector for updates
+type ConnUpdate struct {
+	Connection ConnectionID
+	Data ExportData
 }
 
 type ConnectionID struct {
@@ -102,7 +128,8 @@ var(
 		bytesSentPerSecond: 0.0,
 		bytesRecvPerSecond: 0.0,
 		dataHistory: make(map[ConnectionID]*trackData),
-		
+		NodeUpdateChan: make(chan NodeUpdate, MaxConnBuffer),
+		ConnUpdateChan: make(chan ConnUpdate, MaxConnBuffer),
 	}
 )
 
@@ -185,10 +212,31 @@ func (t *Tracker) run() error {
 				t.dataHistory[id].bytesSent = currbSent
 				t.dataHistory[id].bytesRecv = currbRecv
 
+
 				tConn := time.Since(t.dataHistory[id].lastUpdated)
-				t.dataHistory[id].bytesRecvPerSecond = uint64(float64(currbRecv - lastbRecv)/(float64(tConn)/float64(time.Second)))
-				t.dataHistory[id].bytesSentPerSecond = uint64(float64(currbSent - lastbSent)/(float64(tConn)/float64(time.Second)))
-				t.dataHistory[id].lastUpdated = time.Now()
+
+				bRPS := uint64(float64(currbRecv - lastbRecv)/(float64(tConn)/float64(time.Second)))
+				bSPS := uint64(float64(currbSent - lastbSent)/(float64(tConn)/float64(time.Second)))
+				t.dataHistory[id].bytesRecvPerSecond = bRPS
+				t.dataHistory[id].bytesSentPerSecond = bSPS
+				
+				lastUpdated := time.Now()
+
+				t.dataHistory[id].lastUpdated = lastUpdated
+
+				// Sending the updated stats through the pipe for collector to receive
+				update := ConnUpdate{
+					Connection: id,
+					Data: ExportData{
+						BytesSent: currbSent,
+						BytesRecv: currbRecv,
+						BytesSentPerSecond: bSPS,
+						BytesRecvPerSecond: bRPS,
+						LastUpdated: lastUpdated,
+					},
+				}
+
+				t.ConnUpdateChan<-update
 			}
 
 			
@@ -217,16 +265,35 @@ func (t *Tracker) run() error {
 			}
 
 			t.numConnections = numConnections
+
+			// t.totalSent/Recv is historical, counts bytes for connections that are no longer active
 			t.totalSent = totalSent
 			t.totalRecv = totalRecv
 			t.bytesSent = newSentBytes
 			t.bytesRecv = newRecvBytes
 			tStop := time.Since(t.trackLastUpdated)
-			t.bytesSentPerSecond = uint64(float64(newChangeSentBytes)/(float64(tStop)/float64(time.Second)))
-			t.bytesRecvPerSecond = uint64(float64(newChangeRecvBytes)/(float64(tStop)/float64(time.Second)))
+			// bytes per second for the sent bytes
+			tBSPS := uint64(float64(newChangeSentBytes)/(float64(tStop)/float64(time.Second)))
+			// bytes per second for the receive bytes
+			tBRPS := uint64(float64(newChangeRecvBytes)/(float64(tStop)/float64(time.Second)))
 
+			t.bytesSentPerSecond = tBSPS
+			t.bytesRecvPerSecond = tBRPS
 
-			t.trackLastUpdated = time.Now()
+			tLastUpdated := time.Now()
+			
+			t.trackLastUpdated = tLastUpdated
+
+			trackUpdate := NodeUpdate{
+				BytesSent: totalSent,
+				BytesRecv: totalRecv,
+				BytesSentPerSecond: tBSPS,
+				BytesRecvPerSecond: tBRPS,
+				LastUpdated: tLastUpdated,
+				NumConnections: numConnections,
+			}
+
+			t.NodeUpdateChan<-trackUpdate
 
 		}
 	}
