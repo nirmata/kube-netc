@@ -1,5 +1,5 @@
-# kube-netsee
-Kubernetes BPF network monitor
+# kube-netc
+kube-netc (pronounced <i>kube-net-see</i>) is a Kubernetes network monitor built using eBPF
 
 ## Examples
 
