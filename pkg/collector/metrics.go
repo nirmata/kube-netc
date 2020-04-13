@@ -2,13 +2,11 @@ package collector
 
 // func init() lives in this file
 
-import(
+import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-
 var (
-
 	BytesSent = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "bytes_sent",
@@ -16,7 +14,7 @@ var (
 		},
 		[]string{"id"},
 	)
-	
+
 	BytesRecv = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "bytes_recv",
@@ -48,7 +46,7 @@ var (
 	})
 )
 
-func init(){
+func init() {
 	prometheus.MustRegister(BytesSent)
 	prometheus.MustRegister(BytesRecv)
 	prometheus.MustRegister(BytesRecvPerSecond)

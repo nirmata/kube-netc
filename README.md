@@ -1,4 +1,8 @@
-# kube-netc
+# kube-netc: A Kubernetes eBPF network monitor
+
+[![Build Status](https://travis-ci.org/nirmata/kube-netc.svg?branch=master)](https://travis-ci.org/nirmata/kube-netc) [![Go Report Card](https://goreportcard.com/badge/github.com/nirmata/kube-netc)](https://goreportcard.com/report/github.com/nirmata/kube-netc)
+
+
 kube-netc (pronounced <i>kube-net-see</i>) is a Kubernetes network monitor built using eBPF
 
 ## Examples

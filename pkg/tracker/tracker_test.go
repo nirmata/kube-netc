@@ -1,13 +1,11 @@
 package tracker
 
-import(
+import (
 	"testing"
 	"time"
 )
 
-
-
-func TestStarted(t *testing.T){
+func TestStarted(t *testing.T) {
 	tracker := NewTracker()
 	go tracker.StartTracker()
 	time.Sleep(500 * time.Millisecond)

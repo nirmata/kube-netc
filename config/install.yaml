@@ -22,6 +22,7 @@ spec:
       containers:
       - name: kube-netc
         image:  kube-netc:lastest
+        imagePullPolicy:  Never
         resources:
           limits:
             memory: 200Mi

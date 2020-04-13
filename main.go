@@ -1,15 +1,15 @@
 package main
 
-import(
-	"net/http"
+import (
 	"fmt"
-	
-	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"net/http"
+
 	"github.com/nirmata/kube-netc/pkg/collector"
 	"github.com/nirmata/kube-netc/pkg/tracker"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-func main(){
+func main() {
 	t := tracker.NewTracker()
 	go t.StartTracker()
 	go collector.StartCollector(t)

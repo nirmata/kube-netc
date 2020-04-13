@@ -4,11 +4,11 @@ func (t *Tracker) GetConnectionData() map[ConnectionID]ExportData {
 	m := make(map[ConnectionID]ExportData)
 	for k, v := range t.dataHistory {
 		m[k] = ExportData{
-			BytesSent: v.bytesSent,
-			BytesRecv: v.bytesRecv,
+			BytesSent:          v.bytesSent,
+			BytesRecv:          v.bytesRecv,
 			BytesSentPerSecond: v.bytesSentPerSecond,
 			BytesRecvPerSecond: v.bytesRecvPerSecond,
-			LastUpdated: v.lastUpdated,
+			LastUpdated:        v.lastUpdated,
 		}
 	}
 	return m

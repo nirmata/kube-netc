@@ -3,7 +3,7 @@
 IMAGENAME := kube-netc
 LD_FLAGS:=-ldflags="-w -s"
 BUILD_ARGS := -tags="linux_bpf"
-GIVE_SUDO := sudo -E env PATH=$(PATH)
+GIVE_SUDO := sudo -E env PATH=$(PATH):$(GOPATH)
 
 recv:
 	go build -o recv $(BUILD_ARGS) examples/recv.go
