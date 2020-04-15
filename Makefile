@@ -18,7 +18,6 @@ tests:
 	$(GIVE_SUDO) go test $(BUILD_ARGS) ./pkg/tracker 
 
 build:
-	go get ./pkg/...
 	go build $(BUILD_ARGS) -o main main.go
 
 build-docker:
