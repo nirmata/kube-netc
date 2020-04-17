@@ -25,9 +25,10 @@ build-docker:
 	docker build -t $(IMAGENAME) -f Dockerfile .
 
 run-docker:
-	$(GIVE_SUDO) docker run --rm -v /sys/kernel/debug:/sys/kernel/debug -v /sys/fs/cgroup:/sys/fs/cgroup -v /sys/fs/bpf:/sys/fs/bpf --privileged $(IMAGENAME)
+	$(GIVE_SUDO) docker run --name kube-netc-server --rm -v /sys/kernel/debug:/sys/kernel/debug -v /sys/fs/cgroup:/sys/fs/cgroup -v /sys/fs/bpf:/sys/fs/bpf --privileged $(IMAGENAME)
 
 run: build-docker run-docker
 
 clean:
+	go clean
 	rm -f recv promserv bps main
