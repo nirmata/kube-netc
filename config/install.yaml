@@ -2,9 +2,6 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: kube-netc
-  namespace: kube-system
-  labels:
-    k8s-app: kube-netc
 spec:
   selector:
     matchLabels:
@@ -15,31 +12,33 @@ spec:
         name: kube-netc
     spec:
       tolerations:
-      # this toleration is to have the daemonset runnable on master nodes
-      # remove it if your masters can't run pods
       - key: node-role.kubernetes.io/master
         effect: NoSchedule
       containers:
       - name: kube-netc
-        image:  kube-netc:lastest
-        imagePullPolicy:  Never
-        resources:
-          limits:
-            memory: 200Mi
-          requests:
-            cpu: 100m
-            memory: 200Mi
+        image:  drewrip/kube-netc-test
+        imagePullPolicy:  IfNotPresent
+        ports:
+        - containerPort: 2112
+          protocol: TCP
+        resources: {}
+        securityContext:
+          privileged: true
         volumeMounts:
-        - name: varlog
-          mountPath: /var/log
-        - name: varlibdockercontainers
-          mountPath: /var/lib/docker/containers
-          readOnly: true
-      terminationGracePeriodSeconds: 30
+          - name: debug
+            mountPath: /sys/kernel/debug
+          - name: bpf
+            mountPath: /sys/fs/bpf
+          - name: cgroup
+            mountPath: /sys/fs/cgroup
       volumes:
-      - name: varlog
+      - name: bpf
         hostPath:
-          path: /var/log
-      - name: varlibdockercontainers
+          path: /sys/fs/bpf
+      - name: cgroup
         hostPath:
-          path: /var/lib/docker/containers
+          path: /sys/fs/cgroup
+      - name: debug
+        hostPath:
+          path: /sys/kernel/debug
+      terminationGracePeriodSeconds: 10
