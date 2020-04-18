@@ -20,8 +20,10 @@ tests:
 build:
 	go build $(BUILD_ARGS) -o main main.go
 
-build-docker:
+buildBinForDocker:
 	GOARCH=amd64 CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo $(LD_FLAGS) $(BUILD_ARGS) -o main .
+
+build-docker:
 	docker build -t $(IMAGENAME) -f Dockerfile .
 
 run-docker:
