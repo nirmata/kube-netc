@@ -26,6 +26,9 @@ type Tracker struct {
 	Timeout        time.Duration
 	Config         *ebpf.Config
 	numConnections uint16
+
+	tracer *ebpf.Tracer
+	
 	// These are the totals
 	bytesSent uint64
 	bytesRecv uint64
@@ -43,6 +46,7 @@ type Tracker struct {
 
 	NodeUpdateChan chan NodeUpdate
 	ConnUpdateChan chan ConnUpdate
+	stopChan chan struct{}
 }
 
 // Stats that are tracked for each connection
@@ -124,6 +128,7 @@ var (
 		dataHistory:        make(map[ConnectionID]*trackData),
 		NodeUpdateChan:     make(chan NodeUpdate, MaxConnBuffer),
 		ConnUpdateChan:     make(chan ConnUpdate, MaxConnBuffer),
+		stopChan:           make(chan struct{}, 1),
 	}
 )
 
@@ -161,8 +166,12 @@ func (t *Tracker) run() error {
 	t.trackLastUpdated = time.Now()
 
 	ticker := time.NewTicker(t.Tick).C
-	for range ticker {
 
+ControlLoop:
+	for {
+		select{
+
+			case <-ticker:
 		for k, v := range t.dataHistory {
 			if time.Since(v.lastUpdated) >= 20*time.Second {
 				t.dataHistory[k].active = false
@@ -283,9 +292,15 @@ func (t *Tracker) run() error {
 		}
 
 		t.NodeUpdateChan <- trackUpdate
-
+			case <-t.stopChan:
+			break ControlLoop
+		}
 	}
 	return nil
+}
+
+func (t *Tracker) Stop() {
+	t.stopChan<-struct{}{}
 }
 
 // Clears the current internal tracking data.
