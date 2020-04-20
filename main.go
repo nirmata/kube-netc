@@ -2,15 +2,15 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"log"
-	
+	"net/http"
+
 	"github.com/nirmata/kube-netc/pkg/collector"
 	"github.com/nirmata/kube-netc/pkg/tracker"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-func check(err error){
+func check(err error) {
 	if err != nil {
 		log.Fatalf("[ERR] %s", err)
 	}
