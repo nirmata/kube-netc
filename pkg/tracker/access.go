@@ -18,9 +18,7 @@ func (t *Tracker) GetNumConnections() uint16 {
 	return t.numConnections
 }
 
-
 // Recv
-
 
 func (t *Tracker) GetBytesRecvPerSecond() uint64 {
 	return t.bytesRecvPerSecond
@@ -33,7 +31,6 @@ func (t *Tracker) GetBytesRecv() uint64 {
 func (t *Tracker) GetTotalBytesRecv() uint64 {
 	return t.totalRecv
 }
-
 
 // Sent
 

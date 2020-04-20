@@ -27,8 +27,6 @@ type Tracker struct {
 	Config         *ebpf.Config
 	numConnections uint16
 
-	tracer *ebpf.Tracer
-	
 	// These are the totals
 	bytesSent uint64
 	bytesRecv uint64
@@ -46,7 +44,7 @@ type Tracker struct {
 
 	NodeUpdateChan chan NodeUpdate
 	ConnUpdateChan chan ConnUpdate
-	stopChan chan struct{}
+	stopChan       chan struct{}
 }
 
 // Stats that are tracked for each connection
@@ -169,130 +167,130 @@ func (t *Tracker) run() error {
 
 ControlLoop:
 	for {
-		select{
+		select {
 
-			case <-ticker:
-		for k, v := range t.dataHistory {
-			if time.Since(v.lastUpdated) >= 20*time.Second {
-				t.dataHistory[k].active = false
-			}
-		}
-
-		cs, err := tracer.GetActiveConnections(fmt.Sprintf("%d", os.Getpid()))
-		if err != nil {
-			return err
-		}
-
-		conns := cs.Conns
-		for _, c := range conns {
-			id := ConnectionID{
-				SAddr: c.Source.String(),
-				SPort: c.SPort,
-				DAddr: c.Dest.String(),
-				DPort: c.DPort,
-			}
-			// Creating a new entry for this connection if it doesn't exist
-			if _, ok := t.dataHistory[id]; !ok {
-				t.dataHistory[id] = &trackData{
-					bytesSent:     c.MonotonicSentBytes,
-					bytesRecv:     c.MonotonicRecvBytes,
-					lastBytesSent: c.MonotonicSentBytes,
-					lastBytesRecv: c.MonotonicRecvBytes,
-					active:        true,
-					lastUpdated:   time.Now(),
+		case <-ticker:
+			for k, v := range t.dataHistory {
+				if time.Since(v.lastUpdated) >= 20*time.Second {
+					t.dataHistory[k].active = false
 				}
 			}
-			// Updating the entry if it does exist
-			lastbSent := t.dataHistory[id].bytesSent
-			lastbRecv := t.dataHistory[id].bytesRecv
-			currbSent := c.MonotonicSentBytes
-			currbRecv := c.MonotonicRecvBytes
 
-			t.dataHistory[id].lastBytesSent = lastbSent
-			t.dataHistory[id].lastBytesRecv = lastbRecv
-			t.dataHistory[id].bytesSent = currbSent
-			t.dataHistory[id].bytesRecv = currbRecv
-
-			tConn := time.Since(t.dataHistory[id].lastUpdated)
-
-			bRPS := uint64(float64(currbRecv-lastbRecv) / (float64(tConn) / float64(time.Second)))
-			bSPS := uint64(float64(currbSent-lastbSent) / (float64(tConn) / float64(time.Second)))
-			t.dataHistory[id].bytesRecvPerSecond = bRPS
-			t.dataHistory[id].bytesSentPerSecond = bSPS
-
-			lastUpdated := time.Now()
-
-			t.dataHistory[id].lastUpdated = lastUpdated
-
-			// Sending the updated stats through the pipe for collector to receive
-			update := ConnUpdate{
-				Connection: id,
-				Data: ExportData{
-					BytesSent:          currbSent,
-					BytesRecv:          currbRecv,
-					BytesSentPerSecond: bSPS,
-					BytesRecvPerSecond: bRPS,
-					LastUpdated:        lastUpdated,
-				},
+			cs, err := tracer.GetActiveConnections(fmt.Sprintf("%d", os.Getpid()))
+			if err != nil {
+				return err
 			}
 
-			t.ConnUpdateChan <- update
-		}
+			conns := cs.Conns
+			for _, c := range conns {
+				id := ConnectionID{
+					SAddr: c.Source.String(),
+					SPort: c.SPort,
+					DAddr: c.Dest.String(),
+					DPort: c.DPort,
+				}
+				// Creating a new entry for this connection if it doesn't exist
+				if _, ok := t.dataHistory[id]; !ok {
+					t.dataHistory[id] = &trackData{
+						bytesSent:     c.MonotonicSentBytes,
+						bytesRecv:     c.MonotonicRecvBytes,
+						lastBytesSent: c.MonotonicSentBytes,
+						lastBytesRecv: c.MonotonicRecvBytes,
+						active:        true,
+						lastUpdated:   time.Now(),
+					}
+				}
+				// Updating the entry if it does exist
+				lastbSent := t.dataHistory[id].bytesSent
+				lastbRecv := t.dataHistory[id].bytesRecv
+				currbSent := c.MonotonicSentBytes
+				currbRecv := c.MonotonicRecvBytes
 
-		// Adding the new bytes to the stats
-		var (
-			newSentBytes       uint64 = 0
-			newRecvBytes       uint64 = 0
-			newChangeSentBytes uint64 = 0
-			newChangeRecvBytes uint64 = 0
-			totalSent          uint64 = 0
-			totalRecv          uint64 = 0
-			numConnections     uint16 = 0
-		)
+				t.dataHistory[id].lastBytesSent = lastbSent
+				t.dataHistory[id].lastBytesRecv = lastbRecv
+				t.dataHistory[id].bytesSent = currbSent
+				t.dataHistory[id].bytesRecv = currbRecv
 
-		for _, v := range t.dataHistory {
-			if v.active {
-				numConnections++
-				newSentBytes += v.bytesSent
-				newRecvBytes += v.bytesRecv
-				newChangeSentBytes += (v.bytesSent - v.lastBytesSent)
-				newChangeRecvBytes += (v.bytesRecv - v.lastBytesRecv)
+				tConn := time.Since(t.dataHistory[id].lastUpdated)
+
+				bRPS := uint64(float64(currbRecv-lastbRecv) / (float64(tConn) / float64(time.Second)))
+				bSPS := uint64(float64(currbSent-lastbSent) / (float64(tConn) / float64(time.Second)))
+				t.dataHistory[id].bytesRecvPerSecond = bRPS
+				t.dataHistory[id].bytesSentPerSecond = bSPS
+
+				lastUpdated := time.Now()
+
+				t.dataHistory[id].lastUpdated = lastUpdated
+
+				// Sending the updated stats through the pipe for collector to receive
+				update := ConnUpdate{
+					Connection: id,
+					Data: ExportData{
+						BytesSent:          currbSent,
+						BytesRecv:          currbRecv,
+						BytesSentPerSecond: bSPS,
+						BytesRecvPerSecond: bRPS,
+						LastUpdated:        lastUpdated,
+					},
+				}
+
+				t.ConnUpdateChan <- update
 			}
-			totalSent += v.bytesSent
-			totalRecv += v.bytesRecv
-		}
 
-		t.numConnections = numConnections
+			// Adding the new bytes to the stats
+			var (
+				newSentBytes       uint64 = 0
+				newRecvBytes       uint64 = 0
+				newChangeSentBytes uint64 = 0
+				newChangeRecvBytes uint64 = 0
+				totalSent          uint64 = 0
+				totalRecv          uint64 = 0
+				numConnections     uint16 = 0
+			)
 
-		// t.totalSent/Recv is historical, counts bytes for connections that are no longer active
-		t.totalSent = totalSent
-		t.totalRecv = totalRecv
-		t.bytesSent = newSentBytes
-		t.bytesRecv = newRecvBytes
-		tStop := time.Since(t.trackLastUpdated)
-		// bytes per second for the sent bytes
-		tBSPS := uint64(float64(newChangeSentBytes) / (float64(tStop) / float64(time.Second)))
-		// bytes per second for the receive bytes
-		tBRPS := uint64(float64(newChangeRecvBytes) / (float64(tStop) / float64(time.Second)))
+			for _, v := range t.dataHistory {
+				if v.active {
+					numConnections++
+					newSentBytes += v.bytesSent
+					newRecvBytes += v.bytesRecv
+					newChangeSentBytes += (v.bytesSent - v.lastBytesSent)
+					newChangeRecvBytes += (v.bytesRecv - v.lastBytesRecv)
+				}
+				totalSent += v.bytesSent
+				totalRecv += v.bytesRecv
+			}
 
-		t.bytesSentPerSecond = tBSPS
-		t.bytesRecvPerSecond = tBRPS
+			t.numConnections = numConnections
 
-		tLastUpdated := time.Now()
+			// t.totalSent/Recv is historical, counts bytes for connections that are no longer active
+			t.totalSent = totalSent
+			t.totalRecv = totalRecv
+			t.bytesSent = newSentBytes
+			t.bytesRecv = newRecvBytes
+			tStop := time.Since(t.trackLastUpdated)
+			// bytes per second for the sent bytes
+			tBSPS := uint64(float64(newChangeSentBytes) / (float64(tStop) / float64(time.Second)))
+			// bytes per second for the receive bytes
+			tBRPS := uint64(float64(newChangeRecvBytes) / (float64(tStop) / float64(time.Second)))
 
-		t.trackLastUpdated = tLastUpdated
+			t.bytesSentPerSecond = tBSPS
+			t.bytesRecvPerSecond = tBRPS
 
-		trackUpdate := NodeUpdate{
-			BytesSent:          totalSent,
-			BytesRecv:          totalRecv,
-			BytesSentPerSecond: tBSPS,
-			BytesRecvPerSecond: tBRPS,
-			LastUpdated:        tLastUpdated,
-			NumConnections:     numConnections,
-		}
+			tLastUpdated := time.Now()
 
-		t.NodeUpdateChan <- trackUpdate
-			case <-t.stopChan:
+			t.trackLastUpdated = tLastUpdated
+
+			trackUpdate := NodeUpdate{
+				BytesSent:          totalSent,
+				BytesRecv:          totalRecv,
+				BytesSentPerSecond: tBSPS,
+				BytesRecvPerSecond: tBRPS,
+				LastUpdated:        tLastUpdated,
+				NumConnections:     numConnections,
+			}
+
+			t.NodeUpdateChan <- trackUpdate
+		case <-t.stopChan:
 			break ControlLoop
 		}
 	}
@@ -300,7 +298,7 @@ ControlLoop:
 }
 
 func (t *Tracker) Stop() {
-	t.stopChan<-struct{}{}
+	t.stopChan <- struct{}{}
 }
 
 // Clears the current internal tracking data.
