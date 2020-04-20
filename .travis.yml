@@ -2,6 +2,7 @@ language: go
 
 go:
 - "1.13"
+- "1.14"
 
 before_script:
 - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.24.0
@@ -10,6 +11,9 @@ script:
   - $GOPATH/bin/golangci-lint run ./pkg/tracker/...
   - $GOPATH/bin/golangci-lint run ./pkg/collector/...
   - $GOPATH/bin/golangci-lint run main.go
+
+after_script:
+  - curl -d "repo=https://github.com/nirmata/kube-netc" https://goreportcard.com/checks
 
 notifications:
   email: false

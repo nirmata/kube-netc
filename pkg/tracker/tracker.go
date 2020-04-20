@@ -161,9 +161,7 @@ func (t *Tracker) run() error {
 	t.trackLastUpdated = time.Now()
 
 	ticker := time.NewTicker(t.Tick).C
-	for {
-		select {
-		case <-ticker:
+	for range ticker{
 
 			for k, v := range t.dataHistory {
 				if time.Since(v.lastUpdated) >= 20*time.Second {
@@ -286,8 +284,8 @@ func (t *Tracker) run() error {
 
 			t.NodeUpdateChan <- trackUpdate
 
-		}
 	}
+	return nil
 }
 
 // Clears the current internal tracking data.
