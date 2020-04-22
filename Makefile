@@ -31,6 +31,13 @@ run-docker:
 
 run: build-docker run-docker
 
+lint:
+	$(GOPATH)/bin/golangci-lint run ./pkg/tracker/...
+	$(GOPATH)/bin/golangci-lint run ./pkg/collector/...
+	$(GOPATH)/bin/golangci-lint run main.go
+
+check: tests build clean lint
+
 clean:
 	go clean
 	rm -f recv promserv bps main
