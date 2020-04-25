@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/nirmata/kube-netsee/pkg/collector"
-	"github.com/nirmata/kube-netsee/pkg/tracker"
+	"github.com/nirmata/kube-netc/pkg/collector"
+	"github.com/nirmata/kube-netc/pkg/tracker"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 

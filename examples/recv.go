@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/dustin/go-humanize"
-	"github.com/nirmata/kube-netsee/pkg/tracker"
+	"github.com/nirmata/kube-netc/pkg/tracker"
 	"time"
 )
 
