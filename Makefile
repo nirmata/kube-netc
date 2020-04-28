@@ -34,9 +34,16 @@ run: build-docker run-docker
 lint:
 	$(GOPATH)/bin/golangci-lint run ./pkg/tracker/...
 	$(GOPATH)/bin/golangci-lint run ./pkg/collector/...
+	$(GOPATH)/bin/golangci-lint run ./pkg/cluster/...
 	$(GOPATH)/bin/golangci-lint run main.go
 
-check: tests build clean lint
+format:
+	$(GIVE_SUDO) gofmt -w -s ./pkg/tracker
+	$(GIVE_SUDO) gofmt -w -s ./pkg/collector
+	$(GIVE_SUDO) gofmt -w -s ./pkg/cluster
+	$(GIVE_SUDO) gofmt -w -s main.go
+
+check: tests build clean lint format
 
 clean:
 	go clean

@@ -17,7 +17,7 @@ spec:
       containers:
       - name: kube-netc
         image:  drewrip/kube-netc-test
-        imagePullPolicy:  IfNotPresent
+        imagePullPolicy:  Always
         ports:
         - containerPort: 2112
           protocol: TCP
