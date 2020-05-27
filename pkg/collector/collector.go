@@ -2,10 +2,11 @@ package collector
 
 import (
 	"github.com/nirmata/kube-netc/pkg/tracker"
+	"github.com/nirmata/kube-netc/pkg/cluster"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func StartCollector(tr *tracker.Tracker) {
+func StartCollector(tr *tracker.Tracker, ci *cluster.ClusterInfo) {
 	for {
 		select {
 		case update := <-tr.NodeUpdateChan:

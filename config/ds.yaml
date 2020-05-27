@@ -1,5 +1,3 @@
-# Needs: kubectl create clusterrolebinding default-admin --clusterrole cluster-admin --serviceaccount=default:default
-# the configuration in roles.yaml is attempting to fix this and will be added to this main config once working
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -48,5 +46,3 @@ spec:
       - name: tmp
         emptyDir: {}
       terminationGracePeriodSeconds: 10
-
-

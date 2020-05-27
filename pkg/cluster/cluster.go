@@ -7,7 +7,8 @@ import (
 	"os"
 	"time"
 
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	
+	"k8s.io/api/core/v1"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
@@ -25,14 +26,15 @@ type ClusterInfo struct {
 }
 
 func handleNewPod(obj interface{}) {
-	mObj, ok := obj.(v1.Object)
+	mObj, ok := obj.(*v1.Pod)
 
 	if !ok {
-		check(errors.New("Cannot treat obj as type v1.Object"))
+		check(errors.New("Cannot treat obj as this type"))
 	}
 
 	fmt.Printf("[NEW] Pod %s added\n", mObj.GetName())
 	fmt.Printf("\tLabels: %v\n", mObj.GetLabels())
+	fmt.Printf("\tIP: %v\n", mObj.Status.PodIP)
 }
 
 func (c *ClusterInfo) Run() {
@@ -59,3 +61,14 @@ func (c *ClusterInfo) Run() {
 	informer.Run(stopper)
 
 }
+
+
+/*
+pods, err := clientset.CoreV1().Pods("mpich-system").List(metav1.ListOptions{})
+if err != nil {
+	// handle error
+}
+for _, pod := range pods.Items {
+	fmt.Println(pod.Name, pod.Status.PodIP)
+}
+*/

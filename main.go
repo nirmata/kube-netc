@@ -1,5 +1,4 @@
 package main
-
 import (
 	"fmt"
 	"log"
@@ -22,10 +21,10 @@ func main() {
 	t := tracker.NewTracker()
 	go t.StartTracker()
 
-	go collector.StartCollector(t)
-
-	clusterInfo := cluster.ClusterInfo{}
+	clusterInfo := &cluster.ClusterInfo{}
 	go clusterInfo.Run()
+
+	go collector.StartCollector(t, clusterInfo) 
 
 	http.Handle("/metrics", promhttp.Handler())
 	fmt.Println("[SERVER STARTED ON :2112]")
