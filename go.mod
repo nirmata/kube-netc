@@ -36,8 +36,10 @@ require (
 	golang.org/x/mobile v0.0.0-20200329125638-4c31acba0007 // indirect
 	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e // indirect
 	golang.org/x/sys v0.0.0-20200413165638-669c56c373c4 // indirect
+	gopkg.in/inf.v0 v0.9.1 // indirect
 	k8s.io/api v0.0.0-20181204000039-89a74a8d264d
-	k8s.io/apimachinery v0.18.3
+	k8s.io/apimachinery v0.0.0-20181127025237-2b1284ed4c93
 	k8s.io/client-go v10.0.0+incompatible
-	sigs.k8s.io/kind v0.8.1 // indirect
+	k8s.io/klog v0.1.0 // indirect
+	sigs.k8s.io/yaml v1.2.0 // indirect
 )

@@ -61,14 +61,3 @@ func (c *ClusterInfo) Run() {
 	informer.Run(stopper)
 
 }
-
-
-/*
-pods, err := clientset.CoreV1().Pods("mpich-system").List(metav1.ListOptions{})
-if err != nil {
-	// handle error
-}
-for _, pod := range pods.Items {
-	fmt.Println(pod.Name, pod.Status.PodIP)
-}
-*/
