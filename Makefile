@@ -3,6 +3,7 @@
 IMAGENAME := kube-netc
 LD_FLAGS:=-ldflags="-w -s"
 BUILD_ARGS := -tags="linux_bpf"
+REGISTRY := index.docker.io
 
 recv:
 	go build -o recv $(BUILD_ARGS) examples/recv.go
@@ -29,8 +30,8 @@ run-docker:
 	docker run --name kube-netc-server --rm -v /sys/kernel/debug:/sys/kernel/debug -v /sys/fs/cgroup:/sys/fs/cgroup -v /sys/fs/bpf:/sys/fs/bpf --privileged $(IMAGENAME)
 
 push-docker:
-	docker build -t drewrip/kube-netc-test:latest .
-	docker push drewrip/kube-netc-test:latest
+	docker build -t $(REGISTRY)/nirmata/kube-netc:latest .
+	docker push $(REGISTRY)/nirmata/kube-netc:latest
 
 run: build-docker run-docker
 
