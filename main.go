@@ -21,7 +21,7 @@ func main() {
 	t := tracker.NewTracker()
 	go t.StartTracker()
 
-	clusterInfo := &cluster.ClusterInfo{}
+	clusterInfo := cluster.NewClusterInfo()
 	go clusterInfo.Run()
 
 	go collector.StartCollector(t, clusterInfo) 
