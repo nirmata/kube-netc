@@ -4,11 +4,12 @@ go:
 - "1.14"
 
 before_script:
-- curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.24.0
+- curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.27.0
 
 script:
   - $GOPATH/bin/golangci-lint run ./pkg/tracker/...
   - $GOPATH/bin/golangci-lint run ./pkg/collector/...
+  - $GOPATH/bin/golangci-lint run ./pkg/cluster/...
   - $GOPATH/bin/golangci-lint run main.go
 
 after_script:

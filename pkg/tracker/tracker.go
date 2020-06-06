@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 	// Currently using the forked version
-	"github.com/drewrip/datadog-agent/pkg/ebpf"
+	"github.com/DataDog/datadog-agent/pkg/ebpf"
 )
 
 const (
@@ -109,7 +109,6 @@ var (
 			TCPConnTimeout:               2 * time.Minute,
 			MaxTrackedConnections:        65536,
 			ConntrackMaxStateSize:        65536,
-			ConntrackShortTermBufferSize: 100,
 			ProcRoot:                     "/proc",
 			BPFDebug:                     false,
 			EnableConntrack:              true,
