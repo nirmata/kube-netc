@@ -50,13 +50,13 @@ replace (
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v0.9.2
 	github.com/ugorji/go => github.com/ugorji/go v1.1.7
 	google.golang.org/grpc => google.golang.org/grpc v1.23.0
-	k8s.io/api => k8s.io/api v0.0.0-20181204000039-89a74a8d264d
+	k8s.io/api => k8s.io/api v0.18.3
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.18.3
 	k8s.io/apimachinery => k8s.io/apimachinery v0.18.3
 	k8s.io/apiserver => k8s.io/apiserver v0.18.3
 	k8s.io/autoscaler => k8s.io/autoscaler v0.0.0-20200605154545-936eea18fb1d
 	k8s.io/cli-runtime => k8s.io/cli-runtime v0.18.3
-	k8s.io/client-go => k8s.io/client-go v10.0.0+incompatible
+	k8s.io/client-go => k8s.io/client-go v0.18.3
 	k8s.io/cloud-provider => k8s.io/cloud-provider v0.18.3
 	k8s.io/cluster-bootstrap => k8s.io/cluster-bootstrap v0.18.3
 	k8s.io/code-generator => k8s.io/code-generator v0.18.3
