@@ -16,7 +16,7 @@ spec:
         effect: NoSchedule
       containers:
       - name: kube-netc
-        image:  drewrip/kube-netc-test
+        image:  nirmata/kube-netc
         imagePullPolicy:  Always
         ports:
         - containerPort: 2112
