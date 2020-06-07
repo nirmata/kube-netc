@@ -7,7 +7,6 @@ import (
 	"os"
 	"time"
 
-	
 	"k8s.io/api/core/v1"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
@@ -25,24 +24,24 @@ func check(err error) {
 // been made
 
 type ClusterInfoChange struct {
-	IP string
+	IP   string
 	Info *PodInfo
 }
 
 type PodInfo struct {
-	Name string
+	Name   string
 	Labels map[string]string
 }
 
 type ClusterInfo struct {
 	//IP->Name
-	PodIPMap map[string]*PodInfo
+	PodIPMap      map[string]*PodInfo
 	MapUpdateChan chan ClusterInfoChange
 }
 
 func NewClusterInfo() *ClusterInfo {
 	return &ClusterInfo{
-		PodIPMap: make(map[string]*PodInfo),
+		PodIPMap:      make(map[string]*PodInfo),
 		MapUpdateChan: make(chan ClusterInfoChange),
 	}
 }
@@ -57,21 +56,21 @@ func (c *ClusterInfo) handleNewPod(obj interface{}) {
 	fmt.Printf("[NEW] Pod %s added\n", mObj.GetName())
 	fmt.Printf("\tLabels: %v\n", mObj.GetLabels())
 	fmt.Printf("\tIP: %v\n", mObj.Status.PodIP)
-	
+
 	ip := mObj.Status.PodIP
 	name := mObj.GetName()
 	labels := mObj.GetLabels()
 	pinfo := &PodInfo{
-		Name: name,
+		Name:   name,
 		Labels: labels,
 	}
-	
+
 	// Adding to the map
 	c.PodIPMap[ip] = pinfo
 
 	// Sending new update through channel to collector
-	c.MapUpdateChan<-ClusterInfoChange{
-		IP: mObj.Status.PodIP,
+	c.MapUpdateChan <- ClusterInfoChange{
+		IP:   mObj.Status.PodIP,
 		Info: pinfo,
 	}
 }
@@ -83,12 +82,12 @@ func (c *ClusterInfo) handleUpdatePod(oldObj interface{}, newObj interface{}) {
 		check(errors.New("Cannot treat obj as v1.Pod"))
 	}
 
-	oldObj, oldOk := oldObj.(*v1.Pod)
+	_, oldOk := oldObj.(*v1.Pod)
 
 	if !oldOk {
 		check(errors.New("Cannot treat obj as v1.Pod"))
 	}
-	
+
 	fmt.Printf("[UPDATE] Pod %s\n", mObj.GetName())
 	fmt.Printf("\tLabels: %v\n", mObj.GetLabels())
 	fmt.Printf("\tIP: %v\n", mObj.Status.PodIP)
@@ -97,16 +96,16 @@ func (c *ClusterInfo) handleUpdatePod(oldObj interface{}, newObj interface{}) {
 	name := mObj.GetName()
 	labels := mObj.GetLabels()
 	pinfo := &PodInfo{
-		Name: name,
+		Name:   name,
 		Labels: labels,
 	}
-	
+
 	// Adding to the map
 	c.PodIPMap[ip] = pinfo
 
 	// Sending new update through channel to collector
-	c.MapUpdateChan<-ClusterInfoChange{
-		IP: mObj.Status.PodIP,
+	c.MapUpdateChan <- ClusterInfoChange{
+		IP:   mObj.Status.PodIP,
 		Info: pinfo,
 	}
 }
@@ -121,13 +120,13 @@ func (c *ClusterInfo) handleDeletePod(obj interface{}) {
 	fmt.Printf("[DELETE] Pod %s deleted\n", mObj.GetName())
 	fmt.Printf("\tLabels: %v\n", mObj.GetLabels())
 	fmt.Printf("\tIP: %v\n", mObj.Status.PodIP)
-	
+
 	// Adding to the map
 	c.PodIPMap[mObj.Status.PodIP] = nil
 
 	// Sending new update through channel to collector
-	c.MapUpdateChan<-ClusterInfoChange{
-		IP: mObj.Status.PodIP,
+	c.MapUpdateChan <- ClusterInfoChange{
+		IP:   mObj.Status.PodIP,
 		Info: nil,
 	}
 }
@@ -150,7 +149,7 @@ func (c *ClusterInfo) Run() {
 	stopper := make(chan struct{})
 	defer close(stopper)
 	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: c.handleNewPod,
+		AddFunc:    c.handleNewPod,
 		UpdateFunc: c.handleUpdatePod,
 		DeleteFunc: c.handleDeletePod,
 	})
