@@ -1,0 +1,12 @@
+linters:
+  enable:
+    - gosec
+    - errcheck
+    - gosimple
+    - bodyclose
+    - staticcheck
+  disable:
+    - ineffassign
+    - deadcode
+    - unused
+    - structcheck

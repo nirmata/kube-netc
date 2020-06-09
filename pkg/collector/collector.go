@@ -17,17 +17,19 @@ func StartCollector(tr *tracker.Tracker, ci *cluster.ClusterInfo) {
 		case update := <-tr.ConnUpdateChan:
 
 			var labels prometheus.Labels
+			conn := update.Connection
 
 			if foundName, ok := ci.PodIPMap[update.Connection.DAddr]; ok {
-				fmt.Println("Found pod name from IP")
+				//The pod name is filled if there is a corresponding pod in the cluster
 				labels = prometheus.Labels{
-					"pod_name":    foundName.Name,
-					"pod_address": update.Connection.DAddr,
+					"pod_name":            foundName.Name,
+					"source_address":      tracker.IPPort(conn.SAddr, conn.SPort),
+					"destination_address": tracker.IPPort(conn.DAddr, conn.DPort),
 				}
 			} else {
 				labels = prometheus.Labels{
-					"pod_name":    "NOT_FOUND",
-					"pod_address": update.Connection.DAddr,
+					"source_address":      tracker.IPPort(conn.SAddr, conn.SPort),
+					"destination_address": tracker.IPPort(conn.DAddr, conn.DPort),
 				}
 			}
 
