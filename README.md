@@ -39,7 +39,7 @@ To test the current capabilities of **kube-netc**, this guide will walk you thro
 First, install the daemon set using the install.yaml:
 
 ``` 
-kubectl apply -f config/install.yaml
+kubectl apply -f https://github.com/nirmata/kube-netc/raw/master/config/install.yaml
 ```
 
 This will start the **kube-netc** DaemonSet on your cluster and setup the required roles. Then, we get the name of the kube-netc pod:
