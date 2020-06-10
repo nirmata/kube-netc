@@ -5,7 +5,9 @@ WORKDIR /build
 RUN apk add build-base bcc linux-headers
 RUN GOARCH=amd64 CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -tags="linux_bpf" -o main .
 
-FROM scratch
-COPY --from=builder /build/main /app/
+FROM busybox:latest
+COPY --from=builder /build/ /app/
 WORKDIR /app
+RUN chmod u+xs clear.sh
+CMD ["./clear.sh"]
 CMD ["./main"]
