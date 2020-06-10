@@ -19,18 +19,14 @@ func StartCollector(tr *tracker.Tracker, ci *cluster.ClusterInfo) {
 			var labels prometheus.Labels
 			conn := update.Connection
 
-			if foundName, ok := ci.PodIPMap[update.Connection.DAddr]; ok {
-				//The pod name is filled if there is a corresponding pod in the cluster
-				labels = prometheus.Labels{
-					"pod_name":            foundName.Name,
-					"source_address":      tracker.IPPort(conn.SAddr, conn.SPort),
-					"destination_address": tracker.IPPort(conn.DAddr, conn.DPort),
-				}
-			} else {
-				labels = prometheus.Labels{
-					"source_address":      tracker.IPPort(conn.SAddr, conn.SPort),
-					"destination_address": tracker.IPPort(conn.DAddr, conn.DPort),
-				}
+			sourceFoundName := ci.PodIPMap[conn.SAddr]
+			destinationFoundName := ci.PodIPMap[conn.DAddr]
+			
+			labels = prometheus.Labels{
+				"source_pod_name":            sourceFoundName.Name,
+				"destination_pod_name":       destinationFoundName.Name,
+				"source_address":      tracker.IPPort(conn.SAddr, conn.SPort),
+				"destination_address": tracker.IPPort(conn.DAddr, conn.DPort),
 			}
 
 			BytesSent.With(labels).Set(float64(update.Data.BytesSent))
