@@ -73,29 +73,23 @@ This is an example output of the query showing the total bytes received by this 
 
 ```
 ...
-# HELP bytes_recv Total bytes received from a given connection
-# TYPE bytes_recv gauge
-bytes_recv{pod_address="10.244.0.1",pod_name="NOT_FOUND"} 117
-bytes_recv{pod_address="10.244.0.2",pod_name="kube-netc-j56cx"} 420
-bytes_recv{pod_address="10.244.0.3",pod_name="local-path-provisioner-bd4bb6b75-fjpmj"} 36494
-bytes_recv{pod_address="10.244.0.4",pod_name="coredns-66bff467f8-csjhc"} 2346
-bytes_recv{pod_address="10.244.0.5",pod_name="coredns-66bff467f8-69jxm"} 2346
-bytes_recv{pod_address="10.96.0.1",pod_name="NOT_FOUND"} 71754
-bytes_recv{pod_address="104.18.123.25",pod_name="NOT_FOUND"} 0
-bytes_recv{pod_address="127.0.0.1",pod_name="NOT_FOUND"} 290
-bytes_recv{pod_address="172.18.0.1",pod_name="NOT_FOUND"} 1672
-bytes_recv{pod_address="172.18.0.2",pod_name="kindnet-jpbtd"} 168608
-bytes_recv{pod_address="172.18.0.2",pod_name="kube-apiserver-drewcluster-control-plane"} 56160
-bytes_recv{pod_address="172.18.0.2",pod_name="kube-controller-manager-drewcluster-control-plane"} 43609
-bytes_recv{pod_address="172.18.0.2",pod_name="kube-proxy-s57cn"} 157359
-bytes_recv{pod_address="192.168.1.1",pod_name="NOT_FOUND"} 132
-bytes_recv{pod_address="3.223.220.229",pod_name="NOT_FOUND"} 0
-bytes_recv{pod_address="34.195.246.183",pod_name="NOT_FOUND"} 0
-bytes_recv{pod_address="52.1.121.53",pod_name="NOT_FOUND"} 0
-bytes_recv{pod_address="52.5.11.128",pod_name="NOT_FOUND"} 0
-bytes_recv{pod_address="52.72.232.213",pod_name="NOT_FOUND"} 0
-bytes_recv{pod_address="::1",pod_name="NOT_FOUND"} 1939
+bytes_recv{destination_address="172.17.0.2:35145",destination_pod_name="kube-controller-manager-minikube",source_address="172.17.0.2:8443",source_pod_name="kube-controller-manager-minikube"} 102
+bytes_recv{destination_address="172.17.0.2:35145",destination_pod_name="kube-scheduler-minikube",source_address="172.17.0.2:8443",source_pod_name="kube-scheduler-minikube"} 102
+bytes_recv{destination_address="172.17.0.2:35145",destination_pod_name="storage-provisioner",source_address="172.17.0.2:8443",source_pod_name="storage-provisioner"} 102
+bytes_recv{destination_address="172.17.0.2:46834",destination_pod_name="etcd-minikube",source_address="172.17.0.2:10250",source_pod_name="etcd-minikube"} 1561
+bytes_recv{destination_address="172.17.0.2:46834",destination_pod_name="kube-controller-manager-minikube",source_address="172.17.0.2:10250",source_pod_name="kube-controller-manager-minikube"} 1561
+bytes_recv{destination_address="172.17.0.2:46834",destination_pod_name="kube-scheduler-minikube",source_address="172.17.0.2:10250",source_pod_name="kube-scheduler-minikube"} 1585
+bytes_recv{destination_address="172.17.0.2:46834",destination_pod_name="storage-provisioner",source_address="172.17.0.2:10250",source_pod_name="storage-provisioner"} 1561
+bytes_recv{destination_address="172.17.0.2:47146",destination_pod_name="etcd-minikube",source_address="172.17.0.2:10250",source_pod_name="etcd-minikube"} 671
+bytes_recv{destination_address="172.17.0.2:47146",destination_pod_name="kube-apiserver-minikube",source_address="172.17.0.2:10250",source_pod_name="kube-apiserver-minikube"} 671
+bytes_recv{destination_address="172.17.0.2:47146",destination_pod_name="kube-controller-manager-minikube",source_address="172.17.0.2:10250",source_pod_name="kube-controller-manager-minikube"} 671
+bytes_recv{destination_address="172.17.0.2:47146",destination_pod_name="kube-proxy-b8hqq",source_address="172.17.0.2:10250",source_pod_name="kube-proxy-b8hqq"} 2428
+bytes_recv{destination_address="172.17.0.2:47146",destination_pod_name="kube-scheduler-minikube",source_address="172.17.0.2:10250",source_pod_name="kube-scheduler-minikube"} 671
+bytes_recv{destination_address="172.17.0.2:47146",destination_pod_name="storage-provisioner",source_address="172.17.0.2:10250",source_pod_name="storage-provisioner"} 671
+bytes_recv{destination_address="172.17.0.2:48358",destination_pod_name="kube-scheduler-minikube",source_address="172.17.0.2:8443",source_pod_name="kube-scheduler-minikube"} 572
+bytes_recv{destination_address="172.17.0.2:48414",destination_pod_name="kube-controller-manager-minikube",source_address="172.17.0.2:8443",source_pod_name="kube-controller-manager-minikube"} 572
+bytes_recv{destination_address="172.17.0.2:48474",destination_pod_name="etcd-minikube",source_address="172.17.0.2:8443",source_pod_name="etcd-minikube"} 572
 ...
 ```
 
-As we see the bytes received by each connection is shown and the source IP is given. If there is a known pod with the same IP the *pod_name* is also given, if not it defaults to "NOT FOUND".
+As we see the bytes received by each connection is shown and the source IP is given. If there is a known pod with the same IP the *pod_name* is also given.

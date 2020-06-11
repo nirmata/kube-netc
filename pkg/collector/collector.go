@@ -19,12 +19,20 @@ func StartCollector(tr *tracker.Tracker, ci *cluster.ClusterInfo) {
 			var labels prometheus.Labels
 			conn := update.Connection
 
-			sourceFoundName := ci.PodIPMap[conn.SAddr]
-			destinationFoundName := ci.PodIPMap[conn.DAddr]
+			sourceFoundName := ""
+			destinationFoundName := ""
+
+			if rawSourceName, ok := ci.PodIPMap[conn.SAddr]; ok {
+				sourceFoundName = rawSourceName.Name
+			}
+
+			if rawDestinationName, ok := ci.PodIPMap[conn.DAddr]; ok {
+				destinationFoundName = rawDestinationName.Name
+			}
 			
 			labels = prometheus.Labels{
-				"source_pod_name":            sourceFoundName.Name,
-				"destination_pod_name":       destinationFoundName.Name,
+				"source_pod_name":            sourceFoundName,
+				"destination_pod_name":       destinationFoundName,
 				"source_address":      tracker.IPPort(conn.SAddr, conn.SPort),
 				"destination_address": tracker.IPPort(conn.DAddr, conn.DPort),
 			}

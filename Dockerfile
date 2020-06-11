@@ -8,6 +8,4 @@ RUN GOARCH=amd64 CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -ldflag
 FROM busybox:latest
 COPY --from=builder /build/ /app/
 WORKDIR /app
-RUN chmod u+xs clear.sh
-CMD ["./clear.sh"]
-CMD ["./main"]
+ENTRYPOINT ["/bin/sh", "./entrypoint.sh"]
