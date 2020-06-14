@@ -2,12 +2,12 @@
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
-  namespace: default
+  namespace: kube-system
   name: netc-rbac
 subjects:
   - kind: ServiceAccount
     name: default
-    namespace: default
+    namespace: kube-system
 roleRef:
   kind: ClusterRole
   name: cluster-admin
@@ -18,6 +18,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: kube-netc
+  namespace: kube-system
 spec:
   selector:
     matchLabels:
