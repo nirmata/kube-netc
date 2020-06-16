@@ -5,46 +5,19 @@
 
 kube-netc (pronounced <i>kube-net-see</i>) is a Kubernetes network monitor built using eBPF
 
-## DockerHub
-
-Kube-netc's docker image can be found on DockerHub [here](https://hub.docker.com/r/nirmata/kube-netc).
-
-## Examples
-
-Try the current working sample test programs:
-
-#### recv.go: writing out the number of current active connections
-
-```
-make recv
-sudo ./recv
-```
-
-#### promserv.go: exposing the number of current active connections to prometheus
-
-```
-make promserv
-sudo ./promserv
-```
-The exposed metric is `active_connections`.
-
-## Collector
-
-[The collector](collector/) package is the prometheus collector. Currently it only exposes the trackers activeConnections for testing purposes and has been demonstrated to work with Grafana.
-
-## Tracker
-
-[The tracker](tracker/) package is being used to interface between DataDog's ebpf library and our collector. The tracker converts the connection data into a format usable to the collector and prepares to be read. Much work still needs to be done to design out this package to get the right information, and prepare it to be used when needed by the collector.
-
-## Demo
+## Getting Started
 
 To test the current capabilities of **kube-netc**, this guide will walk you through viewing the network statistics of your nodes.
+
+### Install kube-netc
 
 First, install the daemon set using the install.yaml:
 
 ``` 
 kubectl apply -f https://github.com/nirmata/kube-netc/raw/master/config/install.yaml
 ```
+
+### View results
 
 This will start the **kube-netc** DaemonSet on your cluster and setup the required roles. Then, we get the name of the kube-netc pod:
 
