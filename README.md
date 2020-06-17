@@ -65,4 +65,8 @@ bytes_recv{destination_address="172.17.0.2:48474",destination_pod_name="etcd-min
 ...
 ```
 
-As we see the bytes received by each connection is shown and the source IP is given. If there is a known pod with the same IP the *pod_name* is also given.
+As we see the bytes received by each connection is shown and the source IP is given. If there is a known pod with the same IP the *source_pod_name* and or *destination_pod_name* is also given.
+
+## Design
+
+Please see the [DESIGN](DESIGN.md) for information on how kube-netc is structured.
