@@ -3,11 +3,10 @@ package tracker
 import (
 	"errors"
 	"fmt"
+	"github.com/DataDog/datadog-agent/pkg/ebpf"
 	"log"
 	"os"
 	"time"
-	// Currently using the forked version
-	"github.com/DataDog/datadog-agent/pkg/ebpf"
 )
 
 const (

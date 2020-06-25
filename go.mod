@@ -8,7 +8,6 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/florianl/go-conntrack v0.1.1-0.20200305095641-39d61234c658 // indirect
 	github.com/golang/protobuf v1.4.0 // indirect
-	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/imdario/mergo v0.3.9 // indirect
 	github.com/miekg/dns v1.1.29 // indirect

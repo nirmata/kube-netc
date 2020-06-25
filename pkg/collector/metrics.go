@@ -7,12 +7,33 @@ import (
 )
 
 var (
+	labs = []string{
+		"name",
+		"component",
+		"instance",
+		"version",
+		"part_of",
+		"managed_by",
+		"source_address",
+		"destination_address",
+		"source_name",
+		"destination_name",
+		"source_kind",
+		"destination_kind",
+		"source_namespace",
+		"destination_namespace",
+		"source_node",
+		"destination_node",
+	}
+)
+
+var (
 	BytesSent = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "bytes_sent",
 			Help: "Total bytes sent to a given connection",
 		},
-		[]string{"source_pod_name", "destination_pod_name", "source_address", "destination_address"},
+		labs,
 	)
 
 	BytesRecv = prometheus.NewGaugeVec(
@@ -20,7 +41,7 @@ var (
 			Name: "bytes_recv",
 			Help: "Total bytes received from a given connection",
 		},
-		[]string{"source_pod_name", "destination_pod_name", "source_address", "destination_address"},
+		labs,
 	)
 
 	BytesSentPerSecond = prometheus.NewGaugeVec(
@@ -28,7 +49,7 @@ var (
 			Name: "bytes_sent_per_second",
 			Help: "Bytes per second being sent to a given connection",
 		},
-		[]string{"source_pod_name", "destination_pod_name", "source_address", "destination_address"},
+		labs,
 	)
 
 	BytesRecvPerSecond = prometheus.NewGaugeVec(
@@ -36,7 +57,7 @@ var (
 			Name: "bytes_recv_per_second",
 			Help: "Bytes per second being received from a given connection",
 		},
-		[]string{"source_pod_name", "destination_pod_name", "source_address", "destination_address"},
+		labs,
 	)
 
 	// Number of connections
