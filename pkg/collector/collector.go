@@ -26,13 +26,13 @@ func generateLabels(connup tracker.ConnUpdate, ci *cluster.ClusterInfo) promethe
 
 	conn := connup.Connection
 
-	srcInfo, sok := ci.ObjectIPMap[conn.SAddr]
+	srcInfo, sok := ci.Get(conn.SAddr)
 
 	if !sok {
 		srcInfo = emptyInfo
 	}
-
-	destInfo, dok := ci.ObjectIPMap[conn.DAddr]
+	
+	destInfo, dok := ci.Get(conn.DAddr)
 
 	if !dok {
 		destInfo = emptyInfo

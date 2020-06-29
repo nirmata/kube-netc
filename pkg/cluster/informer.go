@@ -64,7 +64,7 @@ func (c *ClusterInfo) handleNewObject(obj interface{}) {
 	info.LabelManagedBy = labels["managed-by"]
 
 	// Updating the map
-	c.ObjectIPMap[ip] = info
+	c.Set(ip, info)
 }
 
 func (c *ClusterInfo) handleUpdateObject(oldObj interface{}, obj interface{}) {
@@ -126,7 +126,7 @@ func (c *ClusterInfo) handleUpdateObject(oldObj interface{}, obj interface{}) {
 	info.LabelManagedBy = labels["managed-by"]
 
 	// Updating the map
-	c.ObjectIPMap[ip] = info
+	c.Set(ip, info)
 }
 
 func (c *ClusterInfo) handleDeleteObject(obj interface{}) {
@@ -146,5 +146,5 @@ func (c *ClusterInfo) handleDeleteObject(obj interface{}) {
 
 	fmt.Printf("[IP] %s\n", ip)
 	// Updating the map
-	c.ObjectIPMap[ip] = nil
+	c.Set(ip, nil)
 }
