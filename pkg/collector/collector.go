@@ -47,7 +47,7 @@ func generateLabels(connup tracker.ConnUpdate, ci *cluster.ClusterInfo) promethe
 		"part_of":    srcInfo.LabelPartOf,
 		"managed_by": srcInfo.LabelManagedBy,
 		// Nirmata networking labels
-		"source_address":        tracker.IPPort(conn.SAddr, conn.SPort),
+		"source_address":        conn.SAddr,
 		"destination_address":   tracker.IPPort(conn.DAddr, conn.DPort),
 		"source_name":           srcInfo.Name,
 		"destination_name":      destInfo.Name,

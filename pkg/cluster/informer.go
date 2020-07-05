@@ -47,8 +47,6 @@ func (c *ClusterInfo) handleNewObject(obj interface{}) {
 		labels = o.GetLabels()
 	}
 
-	fmt.Printf("%v\n", labels)
-
 	info := &ObjectInfo{
 		Name:      name,
 		Kind:      kind,
@@ -109,8 +107,6 @@ func (c *ClusterInfo) handleUpdateObject(oldObj interface{}, obj interface{}) {
 		labels = o.GetLabels()
 	}
 
-	fmt.Printf("%v\n", labels)
-
 	info := &ObjectInfo{
 		Name:      name,
 		Kind:      kind,
@@ -144,7 +140,6 @@ func (c *ClusterInfo) handleDeleteObject(obj interface{}) {
 		ip = internalIP
 	}
 
-	fmt.Printf("[IP] %s\n", ip)
 	// Updating the map
 	c.Set(ip, nil)
 }

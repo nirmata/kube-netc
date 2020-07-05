@@ -14,6 +14,9 @@ promserv:
 bps:
 	go build -o bps $(BUILD_ARGS) examples/bps.go
 
+bpf:
+	go build -o bpf $(BUILD_ARGS) examples/bpf.go
+
 tests:
 	go test $(BUILD_ARGS) ./pkg/tracker 
 
@@ -51,4 +54,4 @@ check: tests build clean lint format
 
 clean:
 	go clean
-	rm -f recv promserv bps main
+	rm -f recv promserv bps main bpf

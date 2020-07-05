@@ -21,9 +21,11 @@ func main() {
 	t := tracker.NewTracker()
 	go t.StartTracker()
 	time.Sleep(5 * time.Second)
-	conns := t.GetConnectionData()
 	fmt.Printf("\t\t\tIn/s\tOut/s\tIn\tOut\tLast\n")
-	for k, v := range conns {
-		fmt.Printf("%s\t\t%s\t%s\t%s\t%s\t%s\n", formatID(k), bf(v.BytesRecvPerSecond), bf(v.BytesSentPerSecond), bf(v.BytesRecv), bf(v.BytesSent), v.LastUpdated)
+	for {
+		select{
+			case u := <-t.ConnUpdateChan:
+			fmt.Printf("%s\t\t%s\t%s\t%s\t%s\t%s\n", formatID(u.Connection), bf(u.Data.BytesRecvPerSecond), bf(u.Data.BytesSentPerSecond), bf(u.Data.BytesRecv), bf(u.Data.BytesSent), u.Data.LastUpdated)
+		}
 	}
 }
