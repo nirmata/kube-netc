@@ -9,9 +9,6 @@ import (
 	"time"
 )
 
-
-
-
 const (
 	MaxConnBuffer = 256
 )
@@ -34,8 +31,8 @@ type Tracker struct {
 
 	ConnUpdateChan chan ConnUpdate
 	NodeUpdateChan chan NodeUpdate
-	
-	stopChan       chan struct{}
+
+	stopChan chan struct{}
 }
 
 type ConnData struct {
@@ -43,7 +40,7 @@ type ConnData struct {
 	BytesRecv          uint64
 	BytesSentPerSecond uint64
 	BytesRecvPerSecond uint64
-	Active bool
+	Active             bool
 	LastUpdated        time.Time
 }
 
@@ -87,11 +84,11 @@ var (
 			ClientStateExpiry:            2 * time.Minute,
 			ClosedChannelSize:            500,
 		},
-		numConnections:     0,
-		Connections:               make(map[ConnectionID]*ConnData),
-		ConnUpdateChan:     make(chan ConnUpdate, MaxConnBuffer),
-		NodeUpdateChan:     make(chan NodeUpdate, 16),
-		stopChan:           make(chan struct{}, 1),
+		numConnections: 0,
+		Connections:    make(map[ConnectionID]*ConnData),
+		ConnUpdateChan: make(chan ConnUpdate, MaxConnBuffer),
+		NodeUpdateChan: make(chan NodeUpdate, 16),
+		stopChan:       make(chan struct{}, 1),
 	}
 )
 
@@ -133,24 +130,24 @@ ControlLoop:
 		select {
 
 		case <-ticker:
-			
-			t.NodeUpdateChan<-NodeUpdate{
+
+			t.NodeUpdateChan <- NodeUpdate{
 				NumConnections: uint16(len(t.Connections)),
 			}
-			
+
 			for k, v := range t.Connections {
 				if time.Since(v.LastUpdated) >= 20*time.Second {
 					t.Connections[k].Active = false
 				} else if time.Since(v.LastUpdated) >= 5*time.Minute {
 					delete(t.Connections, k)
 				}
-				
+
 			}
 
 			cs, err := tracer.GetActiveConnections(fmt.Sprintf("%d", os.Getpid()))
 
 			if err != nil {
-			return err
+				return err
 			}
 
 			conns := cs.Conns
@@ -165,43 +162,42 @@ ControlLoop:
 				// and we want them to be uniform in this scope
 				bytesSent := c.MonotonicSentBytes
 				bytesRecv := c.MonotonicRecvBytes
-				
-				
+
 				// Creating a new entry for this connection if it doesn't exist
 				if _, ok := t.Connections[id]; !ok {
 					t.Connections[id] = &ConnData{
-						BytesSent:     c.MonotonicSentBytes,
-						BytesRecv:     c.MonotonicRecvBytes,
+						BytesSent:          c.MonotonicSentBytes,
+						BytesRecv:          c.MonotonicRecvBytes,
 						BytesSentPerSecond: 0,
 						BytesRecvPerSecond: 0,
-						Active:        true,
-						LastUpdated:   time.Now(),
+						Active:             true,
+						LastUpdated:        time.Now(),
 					}
 				}
 
 				// See
 				now := Now()
 				// In float64 seconds
-				timeDiff := float64(now - c.LastUpdateEpoch)/1000000000.0
+				timeDiff := float64(now-c.LastUpdateEpoch) / 1000000000.0
 
 				if timeDiff <= 0 {
 					check(errors.New("No difference between LastUpdateEpoch and time.Now(), will create divide by zero error or negative"))
 				}
 
 				// Per Second Calculations
-				bytesSentPerSecond := uint64(float64(bytesSent-c.LastSentBytes)/float64(timeDiff))
-				bytesRecvPerSecond := uint64(float64(bytesRecv-c.LastRecvBytes)/float64(timeDiff))
-				
+				bytesSentPerSecond := uint64(float64(bytesSent-c.LastSentBytes) / float64(timeDiff))
+				bytesRecvPerSecond := uint64(float64(bytesRecv-c.LastRecvBytes) / float64(timeDiff))
+
 				// Sending the updated stats through the pipe for collector to receive
 				update := ConnUpdate{
 					Connection: id,
 					Data: ConnData{
-						BytesSent:     c.MonotonicSentBytes,
-						BytesRecv:     c.MonotonicRecvBytes,
+						BytesSent:          c.MonotonicSentBytes,
+						BytesRecv:          c.MonotonicRecvBytes,
 						BytesSentPerSecond: bytesSentPerSecond,
 						BytesRecvPerSecond: bytesRecvPerSecond,
-						Active:        true,
-						LastUpdated:   time.Now(),
+						Active:             true,
+						LastUpdated:        time.Now(),
 					},
 				}
 
@@ -212,7 +208,7 @@ ControlLoop:
 			break ControlLoop
 		}
 	}
-	
+
 	return nil
 }
 

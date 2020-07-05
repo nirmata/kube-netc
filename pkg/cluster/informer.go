@@ -1,8 +1,6 @@
 package cluster
 
 import (
-	"fmt"
-
 	"k8s.io/api/core/v1"
 )
 
