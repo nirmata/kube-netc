@@ -39,33 +39,24 @@ kubectl port-forward kube-netc-j56cx 2112:2112
 2112 is the port we are going to access the Prometheus endpoint on. We can then curl the /metrics endpoint using curl on local host to show the Prometheus metrics:
 
 ```
-curl localhost:2112/metrics | grep bytes
+curl localhost:2112/metrics | grep bytes_recv{
 ```
 
 This is an example output of the query showing the total bytes received by this node from each given connection:
 
 ```
 ...
-bytes_recv{destination_address="172.17.0.2:35145",destination_pod_name="kube-controller-manager-minikube",source_address="172.17.0.2:8443",source_pod_name="kube-controller-manager-minikube"} 102
-bytes_recv{destination_address="172.17.0.2:35145",destination_pod_name="kube-scheduler-minikube",source_address="172.17.0.2:8443",source_pod_name="kube-scheduler-minikube"} 102
-bytes_recv{destination_address="172.17.0.2:35145",destination_pod_name="storage-provisioner",source_address="172.17.0.2:8443",source_pod_name="storage-provisioner"} 102
-bytes_recv{destination_address="172.17.0.2:46834",destination_pod_name="etcd-minikube",source_address="172.17.0.2:10250",source_pod_name="etcd-minikube"} 1561
-bytes_recv{destination_address="172.17.0.2:46834",destination_pod_name="kube-controller-manager-minikube",source_address="172.17.0.2:10250",source_pod_name="kube-controller-manager-minikube"} 1561
-bytes_recv{destination_address="172.17.0.2:46834",destination_pod_name="kube-scheduler-minikube",source_address="172.17.0.2:10250",source_pod_name="kube-scheduler-minikube"} 1585
-bytes_recv{destination_address="172.17.0.2:46834",destination_pod_name="storage-provisioner",source_address="172.17.0.2:10250",source_pod_name="storage-provisioner"} 1561
-bytes_recv{destination_address="172.17.0.2:47146",destination_pod_name="etcd-minikube",source_address="172.17.0.2:10250",source_pod_name="etcd-minikube"} 671
-bytes_recv{destination_address="172.17.0.2:47146",destination_pod_name="kube-apiserver-minikube",source_address="172.17.0.2:10250",source_pod_name="kube-apiserver-minikube"} 671
-bytes_recv{destination_address="172.17.0.2:47146",destination_pod_name="kube-controller-manager-minikube",source_address="172.17.0.2:10250",source_pod_name="kube-controller-manager-minikube"} 671
-bytes_recv{destination_address="172.17.0.2:47146",destination_pod_name="kube-proxy-b8hqq",source_address="172.17.0.2:10250",source_pod_name="kube-proxy-b8hqq"} 2428
-bytes_recv{destination_address="172.17.0.2:47146",destination_pod_name="kube-scheduler-minikube",source_address="172.17.0.2:10250",source_pod_name="kube-scheduler-minikube"} 671
-bytes_recv{destination_address="172.17.0.2:47146",destination_pod_name="storage-provisioner",source_address="172.17.0.2:10250",source_pod_name="storage-provisioner"} 671
-bytes_recv{destination_address="172.17.0.2:48358",destination_pod_name="kube-scheduler-minikube",source_address="172.17.0.2:8443",source_pod_name="kube-scheduler-minikube"} 572
-bytes_recv{destination_address="172.17.0.2:48414",destination_pod_name="kube-controller-manager-minikube",source_address="172.17.0.2:8443",source_pod_name="kube-controller-manager-minikube"} 572
-bytes_recv{destination_address="172.17.0.2:48474",destination_pod_name="etcd-minikube",source_address="172.17.0.2:8443",source_pod_name="etcd-minikube"} 572
+bytes_recv{component="kube-controller-manager",destination_address="172.18.0.2:1640",destination_kind="pod",destination_name="kube-controller-manager-drewcluster-control-plane",destination_namespace="kube-system",destination_node="drewcluster-control-plane",instance="",managed_by="",name="",part_of="",source_address="172.18.0.2",source_kind="pod",source_name="kube-controller-manager-drewcluster-control-plane",source_namespace="kube-system",source_node="drewcluster-control-plane",version=""} 2960
+bytes_recv{component="kube-controller-manager",destination_address="172.18.0.2:38256",destination_kind="pod",destination_name="kube-controller-manager-drewcluster-control-plane",destination_namespace="kube-system",destination_node="drewcluster-control-plane",instance="",managed_by="",name="",part_of="",source_address="172.18.0.2",source_kind="pod",source_name="kube-controller-manager-drewcluster-control-plane",source_namespace="kube-system",source_node="drewcluster-control-plane",version=""} 295276
+bytes_recv{component="kube-controller-manager",destination_address="172.18.0.2:38258",destination_kind="pod",destination_name="kube-controller-manager-drewcluster-control-plane",destination_namespace="kube-system",destination_node="drewcluster-control-plane",instance="",managed_by="",name="",part_of="",source_address="172.18.0.2",source_kind="pod",source_name="kube-controller-manager-drewcluster-control-plane",source_namespace="kube-system",source_node="drewcluster-control-plane",version=""} 178
+bytes_recv{component="kube-controller-manager",destination_address="172.18.0.2:38446",destination_kind="pod",destination_name="kube-controller-manager-drewcluster-control-plane",destination_namespace="kube-system",destination_node="drewcluster-control-plane",instance="",managed_by="",name="",part_of="",source_address="172.18.0.2",source_kind="pod",source_name="kube-controller-manager-drewcluster-control-plane",source_namespace="kube-system",source_node="drewcluster-control-plane",version=""} 276120
+bytes_recv{component="kube-controller-manager",destination_address="172.18.0.2:38448",destination_kind="pod",destination_name="kube-controller-manager-drewcluster-control-plane",destination_namespace="kube-system",destination_node="drewcluster-control-plane",instance="",managed_by="",name="",part_of="",source_address="172.18.0.2",source_kind="pod",source_name="kube-controller-manager-drewcluster-control-plane",source_namespace="kube-system",source_node="drewcluster-control-plane",version=""} 39315
+bytes_recv{component="kube-controller-manager",destination_address="172.18.0.2:38460",destination_kind="pod",destination_name="kube-controller-manager-drewcluster-control-plane",destination_namespace="kube-system",destination_node="drewcluster-control-plane",instance="",managed_by="",name="",part_of="",source_address="172.18.0.2",source_kind="pod",source_name="kube-controller-manager-drewcluster-control-plane",source_namespace="kube-system",source_node="drewcluster-control-plane",version=""} 122540
+bytes_recv{component="kube-controller-manager",destination_address="172.18.0.2:38496",destination_kind="pod",destination_name="kube-controller-manager-drewcluster-control-plane",destination_namespace="kube-system",destination_node="drewcluster-control-plane",instance="",managed_by="",name="",part_of="",source_address="172.18.0.2",source_kind="pod",source_name="kube-controller-manager-drewcluster-control-plane",source_namespace="kube-system",source_node="drewcluster-control-plane",version=""} 3382
 ...
 ```
 
-As we see the bytes received by each connection is shown and the source IP is given. If there is a known pod with the same IP the *source_pod_name* and or *destination_pod_name* is also given.
+As we see the bytes received by each connection is shown and the source IP is given. If there is a known pod, node or service with the same IP, the *source_name* and or *destination_name* is also given.
 
 ## Design
 

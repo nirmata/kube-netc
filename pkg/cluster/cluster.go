@@ -3,9 +3,9 @@ package cluster
 import (
 	"log"
 	"os"
-	"time"
 	"sync"
-	
+	"time"
+
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
@@ -34,11 +34,11 @@ type ObjectInfo struct {
 }
 
 type ClusterInfo struct {
-	mux sync.Mutex
+	mux         sync.Mutex
 	objectIPMap map[string]*ObjectInfo
 }
 
-func (ci *ClusterInfo) Set(ip string, o *ObjectInfo){
+func (ci *ClusterInfo) Set(ip string, o *ObjectInfo) {
 	ci.mux.Lock()
 	ci.objectIPMap[ip] = o
 	ci.mux.Unlock()

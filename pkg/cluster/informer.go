@@ -1,8 +1,6 @@
 package cluster
 
 import (
-	"fmt"
-
 	"k8s.io/api/core/v1"
 )
 
@@ -46,8 +44,6 @@ func (c *ClusterInfo) handleNewObject(obj interface{}) {
 
 		labels = o.GetLabels()
 	}
-
-	fmt.Printf("%v\n", labels)
 
 	info := &ObjectInfo{
 		Name:      name,
@@ -109,8 +105,6 @@ func (c *ClusterInfo) handleUpdateObject(oldObj interface{}, obj interface{}) {
 		labels = o.GetLabels()
 	}
 
-	fmt.Printf("%v\n", labels)
-
 	info := &ObjectInfo{
 		Name:      name,
 		Kind:      kind,
@@ -144,7 +138,6 @@ func (c *ClusterInfo) handleDeleteObject(obj interface{}) {
 		ip = internalIP
 	}
 
-	fmt.Printf("[IP] %s\n", ip)
 	// Updating the map
 	c.Set(ip, nil)
 }
