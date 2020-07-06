@@ -1,6 +1,6 @@
 package main
 
-import(
+import (
 	"fmt"
 	"github.com/DataDog/datadog-agent/pkg/ebpf"
 	"os"
@@ -8,7 +8,7 @@ import(
 	_ "unsafe"
 )
 
-func check(err error){
+func check(err error) {
 	if err != nil {
 		panic(err)
 	}
@@ -46,7 +46,7 @@ func Nanotime() int64 {
 	return nanotime()
 }
 
-func checkSupport(){
+func checkSupport() {
 	_, err := ebpf.CurrentKernelVersion()
 	check(err)
 
@@ -55,10 +55,7 @@ func checkSupport(){
 	}
 }
 
-
-
-
-func main(){
+func main() {
 	start := Nanotime()
 	fmt.Println(start)
 	tracer, err := ebpf.NewTracer(config)
@@ -69,8 +66,8 @@ func main(){
 		cs, err := tracer.GetActiveConnections(fmt.Sprintf("%d", os.Getpid()))
 		check(err)
 		conns := cs.Conns
-		select{
-			case <-tick:
+		select {
+		case <-tick:
 			for _, c := range conns {
 				fmt.Printf("%v\t\t%d\t\t%d\t\t%d\n", c.Dest, c.MonotonicSentBytes, c.LastSentBytes, c.LastUpdateEpoch)
 			}

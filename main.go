@@ -28,7 +28,7 @@ func main() {
 	go collector.StartCollector(t, clusterInfo)
 
 	http.Handle("/metrics", promhttp.Handler())
-	fmt.Println("[SERVER STARTED ON :2112]")
-	err := http.ListenAndServe(":2112", nil)
+	fmt.Println("[SERVER STARTED ON :9655]")
+	err := http.ListenAndServe(":9655", nil)
 	check(err)
 }

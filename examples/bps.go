@@ -23,8 +23,8 @@ func main() {
 	time.Sleep(5 * time.Second)
 	fmt.Printf("\t\t\tIn/s\tOut/s\tIn\tOut\tLast\n")
 	for {
-		select{
-			case u := <-t.ConnUpdateChan:
+		select {
+		case u := <-t.ConnUpdateChan:
 			fmt.Printf("%s\t\t%s\t%s\t%s\t%s\t%s\n", formatID(u.Connection), bf(u.Data.BytesRecvPerSecond), bf(u.Data.BytesSentPerSecond), bf(u.Data.BytesRecv), bf(u.Data.BytesSent), u.Data.LastUpdated)
 		}
 	}

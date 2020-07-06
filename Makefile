@@ -48,6 +48,7 @@ format:
 	gofmt -w -s ./pkg/tracker
 	gofmt -w -s ./pkg/collector
 	gofmt -w -s ./pkg/cluster
+	gofmt -w -s ./examples
 	gofmt -w -s main.go
 
 check: tests build clean lint format
