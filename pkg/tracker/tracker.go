@@ -26,9 +26,6 @@ type Tracker struct {
 	Config         *ebpf.Config
 	numConnections uint16
 
-	// string key will be in the form ip:port
-	Connections map[ConnectionID]*ConnData
-
 	ConnUpdateChan chan ConnUpdate
 	NodeUpdateChan chan NodeUpdate
 
@@ -85,7 +82,6 @@ var (
 			ClosedChannelSize:            500,
 		},
 		numConnections: 0,
-		Connections:    make(map[ConnectionID]*ConnData),
 		ConnUpdateChan: make(chan ConnUpdate, MaxConnBuffer),
 		NodeUpdateChan: make(chan NodeUpdate, 16),
 		stopChan:       make(chan struct{}, 1),
@@ -131,19 +127,6 @@ ControlLoop:
 
 		case <-ticker:
 
-			t.NodeUpdateChan <- NodeUpdate{
-				NumConnections: uint16(len(t.Connections)),
-			}
-
-			for k, v := range t.Connections {
-				if time.Since(v.LastUpdated) >= 20*time.Second {
-					t.Connections[k].Active = false
-				} else if time.Since(v.LastUpdated) >= 5*time.Minute {
-					delete(t.Connections, k)
-				}
-
-			}
-
 			cs, err := tracer.GetActiveConnections(fmt.Sprintf("%d", os.Getpid()))
 
 			if err != nil {
@@ -151,6 +134,11 @@ ControlLoop:
 			}
 
 			conns := cs.Conns
+
+			t.NodeUpdateChan <- NodeUpdate{
+				NumConnections: uint16(len(conns)),
+			}
+
 			for _, c := range conns {
 				id := ConnectionID{
 					SAddr: c.Source.String(),
@@ -163,19 +151,7 @@ ControlLoop:
 				bytesSent := c.MonotonicSentBytes
 				bytesRecv := c.MonotonicRecvBytes
 
-				// Creating a new entry for this connection if it doesn't exist
-				if _, ok := t.Connections[id]; !ok {
-					t.Connections[id] = &ConnData{
-						BytesSent:          c.MonotonicSentBytes,
-						BytesRecv:          c.MonotonicRecvBytes,
-						BytesSentPerSecond: 0,
-						BytesRecvPerSecond: 0,
-						Active:             true,
-						LastUpdated:        time.Now(),
-					}
-				}
-
-				// See
+				// Using runtime.nanotime(), see util.go
 				now := Now()
 				// In float64 seconds
 				timeDiff := float64(now-c.LastUpdateEpoch) / 1000000000.0
@@ -214,10 +190,4 @@ ControlLoop:
 
 func (t *Tracker) Stop() {
 	t.stopChan <- struct{}{}
-}
-
-// Clears the current internal tracking data.
-func (t *Tracker) ResetStats() error {
-	t.Connections = make(map[ConnectionID]*ConnData)
-	return nil
 }
