@@ -29,17 +29,17 @@ For example, my **kube-netc** pod is:
 
 ```
 kube-netc-j56cx
-```
+``
 In a new terminal, we port-forward the port of our pod so we can access it with *curl* outside the cluster with:
 
 ```
-kubectl port-forward kube-netc-j56cx 2112:2112
+kubectl port-forward kube-netc-j56cx 9655:9655
 ```
 
-2112 is the port we are going to access the Prometheus endpoint on. We can then curl the /metrics endpoint using curl on local host to show the Prometheus metrics:
+9655 is the port we are going to access the Prometheus endpoint on. We can then curl the /metrics endpoint using curl on local host to show the Prometheus metrics:
 
 ```
-curl localhost:2112/metrics | grep bytes_recv{
+curl localhost:9655/metrics | grep bytes_recv{
 ```
 
 This is an example output of the query showing the total bytes received by this node from each given connection:
@@ -61,3 +61,9 @@ As we see the bytes received by each connection is shown and the source IP is gi
 ## Design
 
 Please see the [DESIGN](DESIGN.md) for information on how kube-netc is structured.
+
+## Grafana Demo
+
+There is a pre-prepared Grafana dashboard so you can test out **kube-netc** yourself and visualized the reported stats.
+
+![Grafana Dashboard](grafana_demo_dashboard.png)
