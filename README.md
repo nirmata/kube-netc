@@ -29,7 +29,7 @@ For example, my **kube-netc** pod is:
 
 ```
 kube-netc-j56cx
-``
+```
 In a new terminal, we port-forward the port of our pod so we can access it with *curl* outside the cluster with:
 
 ```
@@ -64,6 +64,6 @@ Please see the [DESIGN](DESIGN.md) for information on how kube-netc is structure
 
 ## Grafana Demo
 
-There is a pre-prepared Grafana dashboard so you can test out **kube-netc** yourself and visualized the reported stats.
+There is a pre-prepared Grafana dashboard so you can test out **kube-netc** yourself and visualize the reported stats.
 
 ![Grafana Dashboard](grafana_demo_dashboard.png)
