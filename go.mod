@@ -3,7 +3,7 @@ module github.com/nirmata/kube-netc
 go 1.13
 
 require (
-	github.com/DataDog/datadog-agent v0.0.0-20200612175552-a48b9b58fb9f
+	github.com/DataDog/datadog-agent v0.0.0-20200605170216-0b30b9a1e3ac
 	github.com/aws/aws-sdk-go v1.30.15 // indirect
 	github.com/dustin/go-humanize v1.0.0
 	github.com/florianl/go-conntrack v0.1.1-0.20200305095641-39d61234c658 // indirect
@@ -16,7 +16,7 @@ require (
 	golang.org/x/crypto v0.0.0-20200423211502-4bdfaf469ed5 // indirect
 	golang.org/x/mobile v0.0.0-20200329125638-4c31acba0007 // indirect
 	k8s.io/api v0.18.3
-	k8s.io/client-go v12.0.0+incompatible
+	k8s.io/client-go v11.0.0+incompatible
 )
 
 // Pinned to kubernetes-1.16.2
@@ -24,7 +24,7 @@ replace github.com/kubernetes-incubator/custom-metrics-apiserver => github.com/k
 
 // Fix tooling version
 replace (
-	github.com/DataDog/datadog-agent => github.com/nirmata/datadog-agent v0.0.0-20200612175552-a48b9b58fb9f
+	github.com/DataDog/datadog-agent => github.com/nirmata/datadog-agent v0.0.0-20200605170216-0b30b9a1e3ac
 	github.com/benesch/cgosymbolizer => github.com/benesch/cgosymbolizer v0.0.0-20190515212042-bec6fe6e597b
 	github.com/fzipp/gocyclo => github.com/fzipp/gocyclo v0.0.0-20150627053110-6acd4345c835 // indirect
 	github.com/golangci/golangci-lint => github.com/golangci/golangci-lint v1.23.1
