@@ -15,7 +15,6 @@ require (
 	github.com/vishvananda/netns v0.0.0-20191106174202-0a2b9b5464df // indirect
 	golang.org/x/crypto v0.0.0-20200423211502-4bdfaf469ed5 // indirect
 	golang.org/x/mobile v0.0.0-20200329125638-4c31acba0007 // indirect
-	golang.org/x/sys v0.0.0-20200413165638-669c56c373c4 // indirect
 	k8s.io/api v0.18.3
 	k8s.io/client-go v11.0.0+incompatible
 )
@@ -25,6 +24,7 @@ replace github.com/kubernetes-incubator/custom-metrics-apiserver => github.com/k
 
 // Fix tooling version
 replace (
+	github.com/DataDog/datadog-agent => github.com/nirmata/datadog-agent v0.0.0-20200605170216-0b30b9a1e3ac
 	github.com/benesch/cgosymbolizer => github.com/benesch/cgosymbolizer v0.0.0-20190515212042-bec6fe6e597b
 	github.com/fzipp/gocyclo => github.com/fzipp/gocyclo v0.0.0-20150627053110-6acd4345c835 // indirect
 	github.com/golangci/golangci-lint => github.com/golangci/golangci-lint v1.23.1
