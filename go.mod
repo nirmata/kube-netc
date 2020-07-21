@@ -13,6 +13,7 @@ require (
 	github.com/miekg/dns v1.1.29 // indirect
 	github.com/prometheus/client_golang v1.5.1
 	github.com/vishvananda/netns v0.0.0-20191106174202-0a2b9b5464df // indirect
+	go.uber.org/zap v1.14.0
 	golang.org/x/crypto v0.0.0-20200423211502-4bdfaf469ed5 // indirect
 	golang.org/x/mobile v0.0.0-20200329125638-4c31acba0007 // indirect
 	k8s.io/api v0.18.3

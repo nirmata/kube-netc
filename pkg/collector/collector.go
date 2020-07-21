@@ -4,6 +4,7 @@ import (
 	"github.com/nirmata/kube-netc/pkg/cluster"
 	"github.com/nirmata/kube-netc/pkg/tracker"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.uber.org/zap"
 )
 
 var (
@@ -22,7 +23,7 @@ var (
 	}
 )
 
-func generateLabels(connup tracker.ConnUpdate, ci *cluster.ClusterInfo) prometheus.Labels {
+func generateLabels(connup tracker.ConnUpdate, ci *cluster.ClusterInfo, logger *zap.SugaredLogger) prometheus.Labels {
 
 	conn := connup.Connection
 
@@ -60,20 +61,23 @@ func generateLabels(connup tracker.ConnUpdate, ci *cluster.ClusterInfo) promethe
 	}
 }
 
-func StartCollector(tr *tracker.Tracker, ci *cluster.ClusterInfo) {
+func StartCollector(tr *tracker.Tracker, ci *cluster.ClusterInfo, logger *zap.SugaredLogger) {
 	for {
 		select {
 		case update := <-tr.NodeUpdateChan:
 			ActiveConnections.Set(float64(update.NumConnections))
+			logger.Debugw("updating num connections",
+				"package", "collector",
+				"num_conns", int(update.NumConnections),
+			)
 
 		case update := <-tr.ConnUpdateChan:
 
-			labels := generateLabels(update, ci)
+			labels := generateLabels(update, ci, logger)
 			BytesSent.With(labels).Set(float64(update.Data.BytesSent))
 			BytesRecv.With(labels).Set(float64(update.Data.BytesRecv))
 			BytesSentPerSecond.With(labels).Set(float64(update.Data.BytesSentPerSecond))
 			BytesRecvPerSecond.With(labels).Set(float64(update.Data.BytesRecvPerSecond))
-
 		}
 
 	}

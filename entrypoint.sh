@@ -25,4 +25,4 @@ echo "-:p__sys_socket" >> /sys/kernel/debug/tracing/kprobe_events || true
 
 echo "Finished Clearing probes..."
 
-./main
+./main -v info

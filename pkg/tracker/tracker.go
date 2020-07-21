@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/DataDog/datadog-agent/pkg/ebpf"
-	"log"
+	"go.uber.org/zap"
 	"os"
 	"time"
 )
@@ -13,9 +13,11 @@ const (
 	MaxConnBuffer = 256
 )
 
-func check(err error) {
+func (t *Tracker) check(err error) {
 	if err != nil {
-		log.Fatalf("[%v] error: %s", time.Now(), err)
+		t.Logger.Fatalw(err.Error(),
+			"package", "tracker",
+		)
 	}
 }
 
@@ -28,6 +30,8 @@ type Tracker struct {
 
 	ConnUpdateChan chan ConnUpdate
 	NodeUpdateChan chan NodeUpdate
+
+	Logger *zap.SugaredLogger
 
 	stopChan chan struct{}
 }
@@ -57,7 +61,6 @@ type ConnectionID struct {
 	DAddr string
 	DPort uint16
 	SAddr string
-	//SPort uint16
 }
 
 var (
@@ -88,15 +91,20 @@ var (
 	}
 )
 
-func NewTracker() *Tracker {
+func NewTracker(logger *zap.SugaredLogger) *Tracker {
+	dt := &DefaultTracker
+	dt.Logger = logger
 	return &DefaultTracker
 }
 
 func (t *Tracker) StartTracker() {
 	err := checkSupport()
-	check(err)
+	t.check(err)
+	t.Logger.Debugw("finished checking for eBPF suport",
+		"package", "tracker",
+	)
 	err = t.run()
-	check(err)
+	t.check(err)
 }
 
 func checkSupport() error {
@@ -108,7 +116,6 @@ func checkSupport() error {
 	if supported, errtip := ebpf.IsTracerSupportedByOS(nil); !supported {
 		return errors.New(errtip)
 	}
-
 	return nil
 }
 
@@ -119,6 +126,10 @@ func (t *Tracker) run() error {
 	}
 
 	ticker := time.NewTicker(t.Tick).C
+
+	t.Logger.Debugw("starting tracker control loop",
+		"package", "tracker",
+	)
 
 ControlLoop:
 	for {
@@ -139,6 +150,11 @@ ControlLoop:
 				NumConnections: uint16(len(conns)),
 			}
 
+			t.Logger.Debugw("num connections calculated",
+				"package", "tracker",
+				"connections", uint16(len(conns)),
+			)
+
 			for _, c := range conns {
 				id := ConnectionID{
 					SAddr: c.Source.String(),
@@ -157,13 +173,27 @@ ControlLoop:
 				timeDiff := float64(now-c.LastUpdateEpoch) / 1000000000.0
 
 				if timeDiff <= 0 {
-					check(errors.New("No difference between LastUpdateEpoch and time.Now(), will create divide by zero error or negative"))
+					t.check(errors.New("no difference between LastUpdateEpoch and time.Now(), will create divide by zero error or negative"))
 				}
 
 				// Per Second Calculations
 				bytesSentPerSecond := uint64(float64(bytesSent-c.LastSentBytes) / float64(timeDiff))
 				bytesRecvPerSecond := uint64(float64(bytesRecv-c.LastRecvBytes) / float64(timeDiff))
-
+				if bytesSentPerSecond > 50e9 {
+					t.Logger.Warnw("extreme transfer rate",
+						"package", "tracker",
+						"source", IPPort(c.Source.String(), c.SPort),
+						"direction", "sent",
+						"bps", bytesSentPerSecond,
+					)
+				} else if bytesRecvPerSecond > 50e9 {
+					t.Logger.Warnw("extreme transfer rate",
+						"package", "tracker",
+						"source", IPPort(c.Source.String(), c.SPort),
+						"direction", "recv",
+						"bps", bytesRecvPerSecond,
+					)
+				}
 				// Sending the updated stats through the pipe for collector to receive
 				update := ConnUpdate{
 					Connection: id,
