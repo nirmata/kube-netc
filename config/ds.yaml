@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: kube-netc
+  namespace: kube-system
 spec:
   selector:
     matchLabels:
@@ -17,6 +18,7 @@ spec:
       containers:
       - name: kube-netc
         image:  nirmata/kube-netc
+        args: ["-v", "info"]
         imagePullPolicy:  Always
         ports:
         - containerPort: 2112

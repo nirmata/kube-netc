@@ -1,20 +1,22 @@
 package cluster
 
 import (
-	"log"
 	"os"
 	"sync"
 	"time"
 
+	"go.uber.org/zap"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-func check(err error) {
+func (c *ClusterInfo) check(err error) {
 	if err != nil {
-		log.Fatalf("[ERR] %s", err)
+		c.Logger.Fatalw(err.Error(),
+			"package", "cluster",
+		)
 	}
 }
 
@@ -35,6 +37,7 @@ type ObjectInfo struct {
 
 type ClusterInfo struct {
 	mux         sync.Mutex
+	Logger      *zap.SugaredLogger
 	objectIPMap map[string]*ObjectInfo
 }
 
@@ -51,9 +54,13 @@ func (ci *ClusterInfo) Get(ip string) (*ObjectInfo, bool) {
 	return val, ok
 }
 
-func NewClusterInfo() *ClusterInfo {
+func NewClusterInfo(logger *zap.SugaredLogger) *ClusterInfo {
+	logger.Debugw("starting cluster mapping",
+		"package", "cluster",
+	)
 	return &ClusterInfo{
 		objectIPMap: make(map[string]*ObjectInfo),
+		Logger:      logger,
 	}
 }
 
@@ -61,14 +68,10 @@ func (c *ClusterInfo) Run() {
 
 	kubeconfig := os.Getenv("KUBECONFIG")
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
-	if err != nil {
-		panic(err.Error())
-	}
+	c.check(err)
 
 	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		panic(err.Error())
-	}
+	c.check(err)
 
 	factory := informers.NewSharedInformerFactory(clientset, 5*time.Second)
 
@@ -98,6 +101,9 @@ func (c *ClusterInfo) Run() {
 		DeleteFunc: c.handleDeleteObject,
 	})
 
+	c.Logger.Debugw("informers starting",
+		"package", "cluster",
+	)
 	go podInformer.Run(stopper)
 	go serviceInformer.Run(stopper)
 	nodeInformer.Run(stopper)

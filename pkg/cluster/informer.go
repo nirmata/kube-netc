@@ -35,7 +35,7 @@ func (c *ClusterInfo) handleNewObject(obj interface{}) {
 		labels = o.GetLabels()
 	case *v1.Node:
 		internalIP, err := getNodeIP(o)
-		check(err)
+		c.check(err)
 		ip = internalIP
 
 		name = o.GetName()
@@ -60,6 +60,12 @@ func (c *ClusterInfo) handleNewObject(obj interface{}) {
 	info.LabelManagedBy = labels["managed-by"]
 
 	// Updating the map
+	c.Logger.Debugw("handling new object map",
+		"package", "cluster",
+		"kind", kind,
+		"ip", ip,
+		"name", name,
+	)
 	c.Set(ip, info)
 }
 
@@ -95,7 +101,7 @@ func (c *ClusterInfo) handleUpdateObject(oldObj interface{}, obj interface{}) {
 		labels = o.GetLabels()
 	case *v1.Node:
 		internalIP, err := getNodeIP(o)
-		check(err)
+		c.check(err)
 		ip = internalIP
 
 		name = o.GetName()
@@ -119,6 +125,13 @@ func (c *ClusterInfo) handleUpdateObject(oldObj interface{}, obj interface{}) {
 	info.LabelPartOf = labels["part-of"]
 	info.LabelManagedBy = labels["managed-by"]
 
+	c.Logger.Debugw("handling update to object map",
+		"package", "cluster",
+		"kind", kind,
+		"ip", ip,
+		"name", name,
+	)
+
 	// Updating the map
 	c.Set(ip, info)
 }
@@ -134,9 +147,14 @@ func (c *ClusterInfo) handleDeleteObject(obj interface{}) {
 		ip = o.Spec.ClusterIP
 	case *v1.Node:
 		internalIP, err := getNodeIP(o)
-		check(err)
+		c.check(err)
 		ip = internalIP
 	}
+
+	c.Logger.Debugw("deleting entry from object map",
+		"package", "cluster",
+		"ip", ip,
+	)
 
 	// Updating the map
 	c.Set(ip, nil)

@@ -34,6 +34,7 @@ spec:
       containers:
       - name: kube-netc
         image:  nirmata/kube-netc
+        args: ["-v", "info"]
         imagePullPolicy:  Always
         ports:
         - containerPort: 2112
