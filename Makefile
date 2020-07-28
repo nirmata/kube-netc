@@ -33,7 +33,7 @@ run-docker:
 	docker run --name kube-netc-server --rm -v /sys/kernel/debug:/sys/kernel/debug -v /sys/fs/cgroup:/sys/fs/cgroup -v /sys/fs/bpf:/sys/fs/bpf --privileged $(IMAGENAME)
 
 push-docker:
-	docker build -t $(REGISTRY)/nirmata/kube-netc:latest .
+	docker build -t $(REGISTRY)/nirmata/kube-netc:latest . -f container/Dockerfile
 	docker push $(REGISTRY)/nirmata/kube-netc:latest
 
 run: build-docker run-docker
