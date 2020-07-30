@@ -7,8 +7,8 @@ import (
 	"go.uber.org/zap"
 )
 
-var (
-	emptyInfo = &cluster.ObjectInfo{
+func getEmpty() *cluster.ObjectInfo {
+	return &cluster.ObjectInfo{
 		Name:      "",
 		Kind:      "",
 		Namespace: "",
@@ -21,7 +21,7 @@ var (
 		LabelPartOf:    "",
 		LabelManagedBy: "",
 	}
-)
+}
 
 func generateLabels(connup tracker.ConnUpdate, ci *cluster.ClusterInfo, logger *zap.SugaredLogger) prometheus.Labels {
 
@@ -30,13 +30,13 @@ func generateLabels(connup tracker.ConnUpdate, ci *cluster.ClusterInfo, logger *
 	srcInfo, sok := ci.Get(conn.SAddr)
 
 	if !sok {
-		srcInfo = emptyInfo
+		srcInfo = getEmpty()
 	}
 
 	destInfo, dok := ci.Get(conn.DAddr)
 
 	if !dok {
-		destInfo = emptyInfo
+		destInfo = getEmpty()
 	}
 
 	return prometheus.Labels{
