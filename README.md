@@ -58,12 +58,26 @@ bytes_recv{component="kube-controller-manager",destination_address="172.18.0.2:3
 
 As we see the bytes received by each connection is shown and the source IP is given. If there is a known pod, node or service with the same IP, the *source_name* and or *destination_name* is also given.
 
-## Design
-
-Please see the [DESIGN](DESIGN.md) for information on how kube-netc is structured.
 
 ## Grafana Demo
 
 There is a pre-prepared Grafana dashboard so you can test out **kube-netc** yourself and visualize the reported stats.
 
-![Grafana Dashboard](grafana_demo_dashboard.png)
+![Grafana Dashboard](grafana/grafana_demo_dashboard.png)
+
+Make sure to point Prometheus to the **kube-netc** exporter in your configuration by appending a new job to your *scrape_configs* in your *prometheus.yml*:
+```
+- job_name: 'kube-netc' 
+    static_configs: 
+    - targets: ['localhost:9655']
+```
+
+Then you can start Prometheus and import [the dashboard](grafana/grafana_kube_netc_demo.json) into Grafana.
+
+## Design
+
+Please see the [DESIGN](DESIGN.md) for information on how kube-netc is structured.
+
+## Thanks
+
+Special thanks to Alban from Kinvolk for his assistance with implementing eBPF and DataDog for their eBPF library.
