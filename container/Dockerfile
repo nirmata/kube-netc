@@ -8,4 +8,4 @@ RUN GOARCH=amd64 CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -ldflag
 FROM busybox:latest
 COPY --from=builder /build/ /app/
 WORKDIR /app
-ENTRYPOINT ["/bin/sh", "./entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "./container/entrypoint.sh"]
