@@ -3,10 +3,12 @@ package tracker
 import (
 	"errors"
 	"fmt"
-	"github.com/DataDog/datadog-agent/pkg/ebpf"
-	"go.uber.org/zap"
 	"os"
 	"time"
+
+	"github.com/DataDog/datadog-agent/pkg/ebpf"
+	"github.com/DataDog/datadog-agent/pkg/network"
+	"go.uber.org/zap"
 )
 
 const (
@@ -155,6 +157,8 @@ ControlLoop:
 				"connections", uint16(len(conns)),
 			)
 
+			connectionMap := make(map[ConnectionID][]network.ConnectionStats)
+
 			for _, c := range conns {
 				id := ConnectionID{
 					SAddr: c.Source.String(),
@@ -162,49 +166,59 @@ ControlLoop:
 					DPort: c.DPort,
 				}
 
-				// These values get used mored than once in calculations
-				// and we want them to be uniform in this scope
-				bytesSent := c.MonotonicSentBytes
-				bytesRecv := c.MonotonicRecvBytes
-
-				// Using runtime.nanotime(), see util.go
-				now := Now()
-				// In float64 seconds
-				timeDiff := float64(now-c.LastUpdateEpoch) / 1000000000.0
-
-				if timeDiff <= 0 {
-					t.check(errors.New("no difference between LastUpdateEpoch and time.Now(), will create divide by zero error or negative"))
+				if _, exists := connectionMap[id]; !exists {
+					connectionMap[id] = []network.ConnectionStats{}
 				}
+				connectionMap[id] = append(connectionMap[id], c)
+			}
 
-				// Per Second Calculations
-				bytesSentPerSecond := uint64(float64(bytesSent-c.LastSentBytes) / float64(timeDiff))
-				bytesRecvPerSecond := uint64(float64(bytesRecv-c.LastRecvBytes) / float64(timeDiff))
-				if bytesSentPerSecond > 50e9 {
-					t.Logger.Warnw("extreme transfer rate",
-						"package", "tracker",
-						"source", IPPort(c.Source.String(), c.SPort),
-						"direction", "sent",
-						"bps", bytesSentPerSecond,
-					)
-				} else if bytesRecvPerSecond > 50e9 {
-					t.Logger.Warnw("extreme transfer rate",
-						"package", "tracker",
-						"source", IPPort(c.Source.String(), c.SPort),
-						"direction", "recv",
-						"bps", bytesRecvPerSecond,
-					)
-				}
-				// Sending the updated stats through the pipe for collector to receive
+			for id, conns := range connectionMap {
 				update := ConnUpdate{
 					Connection: id,
 					Data: ConnData{
-						BytesSent:          c.MonotonicSentBytes,
-						BytesRecv:          c.MonotonicRecvBytes,
-						BytesSentPerSecond: bytesSentPerSecond,
-						BytesRecvPerSecond: bytesRecvPerSecond,
-						Active:             true,
-						LastUpdated:        time.Now(),
+						Active:      true,
+						LastUpdated: time.Now(),
 					},
+				}
+
+				for _, c := range conns {
+					// These values get used mored than once in calculations
+					// and we want them to be uniform in this scope
+					bytesSent := c.MonotonicSentBytes
+					bytesRecv := c.MonotonicRecvBytes
+
+					// Using runtime.nanotime(), see util.go
+					now := Now()
+					// In float64 seconds
+					timeDiff := float64(now-c.LastUpdateEpoch) / 1000000000.0
+
+					if timeDiff <= 0 {
+						t.check(errors.New("no difference between LastUpdateEpoch and time.Now(), will create divide by zero error or negative"))
+					}
+
+					// Per Second Calculations
+					bytesSentPerSecond := uint64(float64(bytesSent-c.LastSentBytes) / float64(timeDiff))
+					bytesRecvPerSecond := uint64(float64(bytesRecv-c.LastRecvBytes) / float64(timeDiff))
+					if bytesSentPerSecond > 50e9 {
+						t.Logger.Warnw("extreme transfer rate",
+							"package", "tracker",
+							"source", IPPort(c.Source.String(), c.SPort),
+							"direction", "sent",
+							"bps", bytesSentPerSecond,
+						)
+					} else if bytesRecvPerSecond > 50e9 {
+						t.Logger.Warnw("extreme transfer rate",
+							"package", "tracker",
+							"source", IPPort(c.Source.String(), c.SPort),
+							"direction", "recv",
+							"bps", bytesRecvPerSecond,
+						)
+					}
+
+					update.Data.BytesSent += c.MonotonicSentBytes
+					update.Data.BytesRecv += c.MonotonicRecvBytes
+					update.Data.BytesSentPerSecond += bytesSentPerSecond
+					update.Data.BytesRecvPerSecond += bytesRecvPerSecond
 				}
 
 				t.ConnUpdateChan <- update

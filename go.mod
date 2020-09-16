@@ -3,11 +3,12 @@ module github.com/nirmata/kube-netc
 go 1.13
 
 require (
-	github.com/DataDog/datadog-agent v0.0.0-20200605170216-0b30b9a1e3ac
+	github.com/DataDog/datadog-agent v0.0.0-20200911152059-f80a69603d3f
 	github.com/aws/aws-sdk-go v1.30.15 // indirect
 	github.com/dustin/go-humanize v1.0.0
 	github.com/florianl/go-conntrack v0.1.1-0.20200305095641-39d61234c658 // indirect
 	github.com/golang/protobuf v1.4.0 // indirect
+	github.com/google/gopacket v1.1.18 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/imdario/mergo v0.3.9 // indirect
 	github.com/miekg/dns v1.1.29 // indirect

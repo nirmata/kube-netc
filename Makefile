@@ -18,7 +18,7 @@ bpf:
 	go build -o bpf $(BUILD_ARGS) examples/bpf.go
 
 tests:
-	go test $(BUILD_ARGS) ./pkg/tracker 
+	go test $(BUILD_ARGS) ./pkg/tracker
 
 build:
 	go build $(BUILD_ARGS) -o main main.go
@@ -27,7 +27,7 @@ buildBinForDocker:
 	GOARCH=amd64 CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo $(LD_FLAGS) $(BUILD_ARGS) -o main .
 
 build-docker:
-	docker build -t $(IMAGENAME) -f Dockerfile .
+	docker build -t $(IMAGENAME) -f container/Dockerfile .
 
 run-docker:
 	docker run --name kube-netc-server --rm -v /sys/kernel/debug:/sys/kernel/debug -v /sys/fs/cgroup:/sys/fs/cgroup -v /sys/fs/bpf:/sys/fs/bpf --privileged $(IMAGENAME)
