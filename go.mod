@@ -75,3 +75,6 @@ replace (
 	k8s.io/metrics => k8s.io/metrics v0.18.3
 	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.18.3
 )
+
+// the bitbucket repo disappeared, version of datadog-agent included doesn't have replace, the newester version does so we have to do the replace here unless we want to update our fork
+replace bitbucket.org/ww/goautoneg => github.com/munnerz/goautoneg v0.0.0-20190414153302-2ae31c8b6b30

@@ -6,9 +6,9 @@ import (
 	"github.com/nirmata/kube-netc/pkg/tracker"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"os"
 	"strconv"
 	"time"
-	"os"
 )
 
 func formatID(id tracker.ConnectionID) string {
@@ -28,7 +28,6 @@ func newZapLogger() *zap.SugaredLogger {
 	encoder := zapcore.NewJSONEncoder(encoderConfig)
 	return zap.New(zapcore.NewCore(encoder, zapcore.Lock(os.Stdout), atom)).Sugar()
 }
-
 
 func main() {
 	logger := newZapLogger()
