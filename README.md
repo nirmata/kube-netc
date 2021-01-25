@@ -22,7 +22,7 @@ kubectl apply -f https://github.com/nirmata/kube-netc/raw/master/config/install.
 This will start the **kube-netc** DaemonSet on your cluster and setup the required roles. Then, we get the name of the kube-netc pod:
 
 ```
-kubectl get pods | grep kube-netc
+kubectl get pods --all-namespaces | grep kube-netc
 ```
 
 For example, my **kube-netc** pod is:
